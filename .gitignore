@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Environments & secrets
+.env
+.env.*
+!.env.example
+
+# Node / React Native
+node_modules/
+.expo/
+*.tsbuildinfo
+
+# ML artifacts & data (versioned via DVC later, not git)
+ml/data/
+ml/models/
+mlruns/
+*.onnx
+*.pt
+*.pth
+*.ckpt
+
+# Databases
+*.sqlite3
+*.db
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
