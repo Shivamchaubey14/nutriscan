@@ -1,0 +1,92 @@
+# NutriScan v1 label set — DRAFT until validated by the data audit (01_data_audit.ipynb).
+# Once frozen, this file does not change for v1: scope discipline is the difference
+# between shipping and not. ~70 classes: top Indian dishes + common fruits & vegetables.
+#
+# Naming: lowercase snake_case, singular. Each class must map to an IFCT/USDA food id
+# (Day 4) and have at least ~150 usable training images across sources (audit check).
+
+version: 1
+status: draft
+
+classes:
+  # --- Indian breakfast / snacks (16) ---
+  - poha
+  - upma
+  - idli
+  - dosa
+  - medu_vada
+  - uttapam
+  - dhokla
+  - samosa
+  - kachori
+  - pakora
+  - vada_pav
+  - pav_bhaji
+  - misal_pav
+  - poori_bhaji
+  - momos
+  - paratha
+
+  # --- Indian mains (20) ---
+  - dal_tadka
+  - dal_makhani
+  - rajma
+  - chole_bhature
+  - chana_masala
+  - palak_paneer
+  - paneer_butter_masala
+  - kadai_paneer
+  - malai_kofta
+  - aloo_gobi
+  - bhindi_masala
+  - baingan_bharta
+  - butter_chicken
+  - chicken_curry
+  - tandoori_chicken
+  - fish_curry
+  - egg_curry
+  - chicken_biryani
+  - veg_pulao
+  - khichdi
+
+  # --- Breads & rice (5) ---
+  - roti
+  - naan
+  - puri
+  - jeera_rice
+  - fried_rice
+
+  # --- Sweets & drinks (9) ---
+  - gulab_jamun
+  - jalebi
+  - rasgulla
+  - kheer
+  - gajar_halwa
+  - ladoo
+  - barfi
+  - masala_chai
+  - lassi
+
+  # --- Fruits (12) ---
+  - apple
+  - banana
+  - mango
+  - orange
+  - grapes
+  - watermelon
+  - papaya
+  - pomegranate
+  - guava
+  - pineapple
+  - strawberry
+  - litchi
+
+  # --- Vegetables (8, raw/whole for scan-a-fruit-bowl cases) ---
+  - tomato
+  - potato
+  - onion
+  - carrot
+  - cucumber
+  - capsicum
+  - cauliflower
+  - spinach
