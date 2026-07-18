@@ -1,0 +1,35 @@
+source_id,name,food_group,energy_kcal,protein_g,fat_g,carb_g,fiber_g
+2705442,"Yogurt, liquid",FNDDS survey food,74.0,3.65,1.07,12.55,0.1
+2705629,"Ice cream, NFS",FNDDS survey food,221.0,3.57,11.3,26.36,0.8
+2705686,"Firni, Indian pudding",FNDDS survey food,144.0,3.58,3.11,25.13,0.3
+2705700,"Barfi or Burfi, Indian dessert",FNDDS survey food,284.0,5.42,11.36,40.43,0.4
+2705978,"Chicken breast, fried, coated, skin / coating eaten, from fast food / restaurant",FNDDS survey food,273.0,19.32,16.95,10.72,0.3
+2706437,Chicken curry,FNDDS survey food,107.0,6.48,6.48,6.54,1.4
+2706538,Biryani with chicken,FNDDS survey food,104.0,7.15,2.38,13.55,1.1
+2706880,"Sandwich, NFS",FNDDS survey food,287.0,12.75,12.03,33.83,1.9
+2706881,"Sandwich wrap, NFS",FNDDS survey food,232.0,12.77,9.4,23.3,1.5
+2706920,"Hamburger, NFS",FNDDS survey food,288.0,17.51,14.38,20.68,0.7
+2707056,"Hot dog sandwich, NFS, on white bun",FNDDS survey food,296.0,10.85,17.37,23.73,0.8
+2707198,"Egg omelet or scrambled egg, NS as to fat",FNDDS survey food,185.0,11.58,15.0,0.91,0.0
+2707415,"Chickpeas, from dried, fat added",FNDDS survey food,211.0,8.23,8.91,25.48,7.1
+2707427,Dal,FNDDS survey food,145.0,8.6,4.31,19.17,7.5
+2707613,"Bread, naan",FNDDS survey food,311.0,11.09,7.28,50.23,5.2
+2707714,"Bread, puri",FNDDS survey food,409.0,6.84,24.94,39.23,3.5
+2707825,"Tortilla, whole wheat",FNDDS survey food,310.0,9.76,9.76,45.89,9.8
+2708062,"Doughnut, NFS",FNDDS survey food,426.0,5.52,22.86,49.52,1.8
+2708063,"Doughnut, cake type, plain",FNDDS survey food,434.0,5.31,24.93,47.06,1.7
+2708344,"Dumpling, no meat",FNDDS survey food,125.0,3.45,3.37,20.49,0.7
+2708346,Idli,FNDDS survey food,128.0,6.36,0.35,24.98,5.8
+2708349,Funnel cake with sugar,FNDDS survey food,353.0,7.87,16.57,43.49,1.0
+2708614,"Pizza, cheese, from restaurant or fast food, NS as to type of crust",FNDDS survey food,266.0,11.39,9.69,33.33,2.3
+2708700,"Egg roll, meatless",FNDDS survey food,270.0,5.62,14.14,30.02,2.3
+2708730,Samosa,FNDDS survey food,310.0,5.14,17.47,33.16,1.8
+2708951,"Rice, fried, meatless",FNDDS survey food,174.0,3.84,3.19,32.5,1.1
+2708952,"Rice, fried, NFS",FNDDS survey food,174.0,3.84,3.19,32.5,1.1
+2709129,"Dosa, with filling",FNDDS survey food,184.0,5.46,4.27,30.8,2.2
+2709456,"Potato, french fries, NFS",FNDDS survey food,225.0,2.5,14.07,23.23,1.8
+2709631,Palak Paneer,FNDDS survey food,101.0,5.42,7.02,4.28,0.9
+2709947,"Okra, fresh, cooked, fat added",FNDDS survey food,59.0,2.02,2.94,7.76,3.3
+2710066,Pakora,FNDDS survey food,125.0,4.92,4.77,16.24,3.2
+2710067,Vegetable curry,FNDDS survey food,86.0,1.6,5.27,8.81,1.8
+2710506,"Tea, hot, with milk",FNDDS survey food,51.0,1.58,1.05,8.95,0.1

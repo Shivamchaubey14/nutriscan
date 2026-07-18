@@ -12,6 +12,9 @@ dev = [
     "mypy>=1.13",
     "pytest>=8.3",
     "pre-commit>=4.0",
+    "pymysql>=1.2.0",
+    "types-pymysql>=1.1.0.20260518",
+    "types-pyyaml>=6.0.12.20260518",
 ]
 ml = [
     "jupyter>=1.1",
