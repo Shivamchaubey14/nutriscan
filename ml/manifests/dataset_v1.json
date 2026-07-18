@@ -1,0 +1,24 @@
+{
+  "dataset_version": 1,
+  "seed": 42,
+  "filters": {
+    "min_side": 128,
+    "min_backfill": 150
+  },
+  "n_candidates": 30019,
+  "n_after_filter_dedupe": 27860,
+  "classes": 58,
+  "excluded_backfill_classes": [
+    "aloo_gobi"
+  ],
+  "split_counts": {
+    "train": 23122,
+    "val": 2658,
+    "test": 1944
+  },
+  "manifest_sha256": {
+    "train": "566c807e1d11b31deedb496167ece44994af8b75879bf12aeab2a371ba8f555e",
+    "val": "5bba1d03514e9fa5bd2a664eb25366dab7fa5f741748b139b3609491038fb9db",
+    "test": "94a78595b412dad0845dd96c3f7f22b1a434d9a77ca3b827f67d059c1186ccdb"
+  }
+}
