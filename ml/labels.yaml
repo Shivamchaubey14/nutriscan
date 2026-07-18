@@ -1,85 +1,82 @@
-# NutriScan v1 label set — DRAFT until validated by the data audit (01_data_audit.ipynb).
-# Once frozen, this file does not change for v1: scope discipline is the difference
-# between shipping and not. ~70 classes: top Indian dishes + common fruits & vegetables.
+# NutriScan v1 label set — FROZEN 2026-07-18 by the data audit (01_data_audit.ipynb).
+# This file does not change for v1: scope discipline is the difference between
+# shipping and not. 59 classes: Indian dishes + fruits/veg + common Western dishes.
 #
-# Naming: lowercase snake_case, singular. Each class must map to an IFCT/USDA food id
-# (Day 4) and have at least ~150 usable training images across sources (audit check).
+# Naming: lowercase snake_case, singular. Each class maps to an IFCT/USDA food id
+# (Day 4). Audit evidence (images available across sources, 2026-07-18):
+#   - 28 classes with >=150 images (staples, Western via Food-101, capsicum)
+#   - 15 produce classes with 88-119 images (usable with augmentation)
+#   - 14 Indian classes at ~50 images, kept because they are core to the product;
+#     listed under `backfill` — curated scraping per SRS ML-1 must raise them to
+#     >=150 before the Day 5 frozen split, else they are cut then.
+# 24 draft classes had zero usable images and were dropped (see audit notebook §6).
 
 version: 1
-status: draft
+status: frozen
 
 classes:
-  # --- Indian breakfast / snacks (16) ---
+  # --- Indian breakfast / snacks (12) ---
   - poha
-  - upma
   - idli
   - dosa
-  - medu_vada
-  - uttapam
   - dhokla
   - samosa
   - kachori
   - pakora
-  - vada_pav
   - pav_bhaji
-  - misal_pav
-  - poori_bhaji
+  - pani_puri
+  - kathi_roll
   - momos
-  - paratha
+  - chole_bhature
 
-  # --- Indian mains (20) ---
+  # --- Indian mains (11) ---
   - dal_tadka
   - dal_makhani
-  - rajma
-  - chole_bhature
   - chana_masala
   - palak_paneer
   - paneer_butter_masala
   - kadai_paneer
-  - malai_kofta
   - aloo_gobi
   - bhindi_masala
-  - baingan_bharta
   - butter_chicken
   - chicken_curry
-  - tandoori_chicken
-  - fish_curry
-  - egg_curry
   - chicken_biryani
-  - veg_pulao
-  - khichdi
 
-  # --- Breads & rice (5) ---
+  # --- Breads & rice (3) ---
   - roti
   - naan
-  - puri
-  - jeera_rice
   - fried_rice
 
-  # --- Sweets & drinks (9) ---
+  # --- Sweets & drinks (8) ---
   - gulab_jamun
   - jalebi
   - rasgulla
-  - kheer
   - gajar_halwa
-  - ladoo
-  - barfi
+  - kulfi
   - masala_chai
   - lassi
 
-  # --- Fruits (12) ---
+  # --- Western dishes via base datasets (10, SRS §2.1) ---
+  - pizza
+  - burger
+  - french_fries
+  - hot_dog
+  - donut
+  - sandwich
+  - fried_chicken
+  - ice_cream
+  - omelette
+  - spring_roll
+
+  # --- Fruits (8) ---
   - apple
   - banana
   - mango
   - orange
   - grapes
   - watermelon
-  - papaya
   - pomegranate
-  - guava
   - pineapple
-  - strawberry
-  - litchi
 
   # --- Vegetables (8, raw/whole for scan-a-fruit-bowl cases) ---
   - tomato
@@ -90,3 +87,54 @@ classes:
   - capsicum
   - cauliflower
   - spinach
+
+# Classes kept below the 150-image bar (~50 images today). Curated scraping
+# (SRS ML-1, scarcity risk mitigation) must backfill these to >=150 before the
+# Day 5 frozen split; any class still short gets cut from the split, not from
+# this file.
+backfill:
+  - poha
+  - kachori
+  - pani_puri
+  - dal_tadka
+  - chana_masala
+  - palak_paneer
+  - paneer_butter_masala
+  - aloo_gobi
+  - bhindi_masala
+  - butter_chicken
+  - chicken_biryani
+  - gulab_jamun
+  - rasgulla
+  - gajar_halwa
+  - lassi
+
+# Dataset-folder name -> label. Single source of truth for the audit notebook
+# and Day 5 prepare_data.py merge step. Keys are normalized folder names
+# (lowercase, spaces/hyphens -> underscores).
+aliases:
+  chapati: roti
+  chapathi: roti
+  makki_di_roti_sarson_da_saag: roti
+  butter_naan: naan
+  chai: masala_chai
+  biryani: chicken_biryani
+  gajar_ka_halwa: gajar_halwa
+  carrot_halwa: gajar_halwa
+  bell_pepper: capsicum
+  masala_dosa: dosa
+  pakode: pakora
+  pakoda: pakora
+  kadhi_pakoda: pakora
+  chhole_bhature: chole_bhature
+  momo: momos
+  butter_paneer: paneer_butter_masala
+  chanamasala: chana_masala
+  paani_puri: pani_puri
+  kaathi_rolls: kathi_roll
+  hamburger: burger
+  fries: french_fries
+  donuts: donut
+  club_sandwich: sandwich
+  crispy_chicken: fried_chicken
+  spring_rolls: spring_roll
