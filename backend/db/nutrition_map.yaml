@@ -1,0 +1,416 @@
+# NutriScan v1: vision class -> nutrition food mapping.
+# Every class in ml/labels.yaml maps to one food (IFCT 2017 code or USDA FNDDS
+# 2021-2023 fdc_id, both present in backend/db/seeds/) plus household portions.
+# match: exact = same dish/food measured by the source; proxy = closest available
+# food (documented in note) until a better source or lab value replaces it.
+# Portions are per-item gram weights; exactly one carries default: true.
+# Validated against labels.yaml and the seeds by tests/test_nutrition.py.
+
+version: 1
+
+classes:
+  # --- Indian breakfast / snacks ---
+  poha:
+    source: USDA
+    source_id: "2708951"
+    match: proxy
+    note: Rice, fried, meatless — closest to flattened-rice poha sauteed in oil.
+    portions:
+      - {unit: plate, grams: 150, default: true}
+      - {unit: katori, grams: 100}
+  idli:
+    source: USDA
+    source_id: "2708346"
+    match: exact
+    portions:
+      - {unit: piece, grams: 75, default: true}
+      - {unit: plate, grams: 150}
+  dosa:
+    source: USDA
+    source_id: "2709129"
+    match: exact
+    note: FNDDS "Dosa, with filling" — most photos are masala dosa.
+    portions:
+      - {unit: piece, grams: 180, default: true}
+  dhokla:
+    source: USDA
+    source_id: "2708346"
+    match: proxy
+    note: Idli — steamed fermented batter cake, closest energy density.
+    portions:
+      - {unit: piece, grams: 50, default: true}
+      - {unit: plate, grams: 150}
+  samosa:
+    source: USDA
+    source_id: "2708730"
+    match: exact
+    portions:
+      - {unit: piece, grams: 100, default: true}
+  kachori:
+    source: USDA
+    source_id: "2708730"
+    match: proxy
+    note: Samosa — fried stuffed pastry, closest match.
+    portions:
+      - {unit: piece, grams: 70, default: true}
+  pakora:
+    source: USDA
+    source_id: "2710066"
+    match: exact
+    portions:
+      - {unit: plate, grams: 120, default: true}
+      - {unit: piece, grams: 30}
+  pav_bhaji:
+    source: USDA
+    source_id: "2710067"
+    match: proxy
+    note: Vegetable curry — bhaji only; pav bread adds ~2x 50 g pieces.
+    portions:
+      - {unit: plate, grams: 250, default: true}
+  pani_puri:
+    source: USDA
+    source_id: "2707714"
+    match: proxy
+    note: Bread, puri — shells dominate calories; spiced water mostly volume.
+    portions:
+      - {unit: plate, grams: 90, default: true}
+      - {unit: piece, grams: 15}
+  kathi_roll:
+    source: USDA
+    source_id: "2706881"
+    match: proxy
+    note: Sandwich wrap, NFS — flatbread roll with mixed filling.
+    portions:
+      - {unit: piece, grams: 180, default: true}
+  momos:
+    source: USDA
+    source_id: "2708344"
+    match: proxy
+    note: Dumpling, no meat — veg momo; meat momos run slightly higher.
+    portions:
+      - {unit: plate, grams: 150, default: true}
+      - {unit: piece, grams: 25}
+  chole_bhature:
+    source: USDA
+    source_id: "2707415"
+    match: proxy
+    note: Chickpeas cooked with fat — chole only; bhature add ~2x 100 g fried bread.
+    portions:
+      - {unit: plate, grams: 350, default: true}
+
+  # --- Indian mains ---
+  dal_tadka:
+    source: USDA
+    source_id: "2707427"
+    match: exact
+    portions:
+      - {unit: katori, grams: 150, default: true}
+  dal_makhani:
+    source: USDA
+    source_id: "2707427"
+    match: proxy
+    note: Dal — makhani is richer (butter/cream); underestimates somewhat.
+    portions:
+      - {unit: katori, grams: 150, default: true}
+  chana_masala:
+    source: USDA
+    source_id: "2707415"
+    match: proxy
+    note: Chickpeas cooked with fat — very close to chana masala.
+    portions:
+      - {unit: katori, grams: 150, default: true}
+  palak_paneer:
+    source: USDA
+    source_id: "2709631"
+    match: exact
+    portions:
+      - {unit: katori, grams: 150, default: true}
+  paneer_butter_masala:
+    source: USDA
+    source_id: "2709631"
+    match: proxy
+    note: Palak Paneer — creamy tomato gravy is richer; underestimates somewhat.
+    portions:
+      - {unit: katori, grams: 150, default: true}
+  kadai_paneer:
+    source: USDA
+    source_id: "2709631"
+    match: proxy
+    note: Palak Paneer — closest paneer curry in FNDDS.
+    portions:
+      - {unit: katori, grams: 150, default: true}
+  aloo_gobi:
+    source: USDA
+    source_id: "2710067"
+    match: proxy
+    note: Vegetable curry — dry sabzi of potato and cauliflower.
+    portions:
+      - {unit: katori, grams: 150, default: true}
+  bhindi_masala:
+    source: USDA
+    source_id: "2709947"
+    match: proxy
+    note: Okra cooked with fat — near-identical preparation.
+    portions:
+      - {unit: katori, grams: 100, default: true}
+  butter_chicken:
+    source: USDA
+    source_id: "2706437"
+    match: proxy
+    note: Chicken curry — butter chicken is richer; underestimates somewhat.
+    portions:
+      - {unit: katori, grams: 180, default: true}
+  chicken_curry:
+    source: USDA
+    source_id: "2706437"
+    match: exact
+    portions:
+      - {unit: katori, grams: 180, default: true}
+  chicken_biryani:
+    source: USDA
+    source_id: "2706538"
+    match: exact
+    portions:
+      - {unit: plate, grams: 250, default: true}
+
+  # --- Breads & rice ---
+  roti:
+    source: USDA
+    source_id: "2707825"
+    match: proxy
+    note: Tortilla, whole wheat — same dough and cooking as chapati.
+    portions:
+      - {unit: piece, grams: 40, default: true}
+  naan:
+    source: USDA
+    source_id: "2707613"
+    match: exact
+    portions:
+      - {unit: piece, grams: 90, default: true}
+  fried_rice:
+    source: USDA
+    source_id: "2708952"
+    match: exact
+    portions:
+      - {unit: plate, grams: 200, default: true}
+      - {unit: katori, grams: 130}
+
+  # --- Sweets & drinks ---
+  gulab_jamun:
+    source: USDA
+    source_id: "2708063"
+    match: proxy
+    note: Plain cake doughnut — fried milk-solid dough; syrup raises sugar share.
+    portions:
+      - {unit: piece, grams: 40, default: true}
+  jalebi:
+    source: USDA
+    source_id: "2708349"
+    match: proxy
+    note: Funnel cake with sugar — fried batter spiral in sugar, near-identical.
+    portions:
+      - {unit: piece, grams: 30, default: true}
+      - {unit: plate, grams: 100}
+  rasgulla:
+    source: USDA
+    source_id: "2705686"
+    match: proxy
+    note: Firni (milk pudding) — closest light milk-based sweet in FNDDS.
+    portions:
+      - {unit: piece, grams: 50, default: true}
+  gajar_halwa:
+    source: USDA
+    source_id: "2705700"
+    match: proxy
+    note: Barfi — dense milk sweet; halwa is slightly lighter per 100 g.
+    portions:
+      - {unit: katori, grams: 100, default: true}
+  kulfi:
+    source: USDA
+    source_id: "2705629"
+    match: proxy
+    note: Ice cream, NFS — kulfi is denser (no whipped air); underestimates a bit.
+    portions:
+      - {unit: piece, grams: 80, default: true}
+  masala_chai:
+    source: USDA
+    source_id: "2710506"
+    match: exact
+    note: Tea, hot, with milk — sugar varies; default assumes lightly sweetened.
+    portions:
+      - {unit: cup, grams: 150, default: true}
+  lassi:
+    source: USDA
+    source_id: "2705442"
+    match: proxy
+    note: Yogurt, liquid — sweet lassi adds sugar; plain is near-identical.
+    portions:
+      - {unit: glass, grams: 250, default: true}
+
+  # --- Western dishes ---
+  pizza:
+    source: USDA
+    source_id: "2708614"
+    match: exact
+    portions:
+      - {unit: slice, grams: 110, default: true}
+  burger:
+    source: USDA
+    source_id: "2706920"
+    match: exact
+    portions:
+      - {unit: piece, grams: 150, default: true}
+  french_fries:
+    source: USDA
+    source_id: "2709456"
+    match: exact
+    portions:
+      - {unit: serving, grams: 115, default: true}
+  hot_dog:
+    source: USDA
+    source_id: "2707056"
+    match: exact
+    portions:
+      - {unit: piece, grams: 100, default: true}
+  donut:
+    source: USDA
+    source_id: "2708062"
+    match: exact
+    portions:
+      - {unit: piece, grams: 60, default: true}
+  sandwich:
+    source: USDA
+    source_id: "2706880"
+    match: exact
+    portions:
+      - {unit: piece, grams: 150, default: true}
+  fried_chicken:
+    source: USDA
+    source_id: "2705978"
+    match: exact
+    note: Fast-food fried chicken breast, coating eaten.
+    portions:
+      - {unit: piece, grams: 130, default: true}
+  ice_cream:
+    source: USDA
+    source_id: "2705629"
+    match: exact
+    portions:
+      - {unit: scoop, grams: 65, default: true}
+  omelette:
+    source: USDA
+    source_id: "2707198"
+    match: exact
+    portions:
+      - {unit: piece, grams: 90, default: true}
+  spring_roll:
+    source: USDA
+    source_id: "2708700"
+    match: exact
+    note: Egg roll, meatless — typical veg spring roll.
+    portions:
+      - {unit: piece, grams: 60, default: true}
+
+  # --- Fruits (IFCT 2017, raw edible portion) ---
+  apple:
+    source: IFCT
+    source_id: E001
+    match: exact
+    portions:
+      - {unit: piece, grams: 180, default: true}
+  banana:
+    source: IFCT
+    source_id: E012
+    match: exact
+    portions:
+      - {unit: piece, grams: 120, default: true}
+  mango:
+    source: IFCT
+    source_id: E036
+    match: exact
+    portions:
+      - {unit: piece, grams: 200, default: true}
+      - {unit: katori, grams: 120}
+  orange:
+    source: IFCT
+    source_id: E047
+    match: exact
+    portions:
+      - {unit: piece, grams: 130, default: true}
+  grapes:
+    source: IFCT
+    source_id: E026
+    match: exact
+    portions:
+      - {unit: katori, grams: 90, default: true}
+  watermelon:
+    source: IFCT
+    source_id: E065
+    match: exact
+    portions:
+      - {unit: slice, grams: 280, default: true}
+      - {unit: katori, grams: 150}
+  pomegranate:
+    source: IFCT
+    source_id: E055
+    match: exact
+    portions:
+      - {unit: piece, grams: 250, default: true}
+      - {unit: katori, grams: 90}
+  pineapple:
+    source: IFCT
+    source_id: E053
+    match: exact
+    portions:
+      - {unit: slice, grams: 80, default: true}
+
+  # --- Vegetables (IFCT 2017, raw whole) ---
+  tomato:
+    source: IFCT
+    source_id: D075
+    match: exact
+    portions:
+      - {unit: piece, grams: 100, default: true}
+  potato:
+    source: IFCT
+    source_id: F006
+    match: exact
+    portions:
+      - {unit: piece, grams: 120, default: true}
+  onion:
+    source: IFCT
+    source_id: G017
+    match: exact
+    portions:
+      - {unit: piece, grams: 110, default: true}
+  carrot:
+    source: IFCT
+    source_id: F002
+    match: exact
+    portions:
+      - {unit: piece, grams: 60, default: true}
+  cucumber:
+    source: IFCT
+    source_id: D043
+    match: exact
+    portions:
+      - {unit: piece, grams: 150, default: true}
+  capsicum:
+    source: IFCT
+    source_id: D033
+    match: exact
+    portions:
+      - {unit: piece, grams: 120, default: true}
+  cauliflower:
+    source: IFCT
+    source_id: D036
+    match: exact
+    portions:
+      - {unit: piece, grams: 400, default: true}
+      - {unit: katori, grams: 100}
+  spinach:
+    source: IFCT
+    source_id: C033
+    match: exact
+    portions:
+      - {unit: bunch, grams: 100, default: true}
