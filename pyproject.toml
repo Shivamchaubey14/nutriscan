@@ -15,6 +15,12 @@ dev = [
     "pymysql>=1.2.0",
     "types-pymysql>=1.1.0.20260518",
     "types-pyyaml>=6.0.12.20260518",
+    "imagehash>=4.3.2",
+    "ddgs>=9.14.4",
+    "requests>=2.34.2",
+    "types-requests>=2.33.0.20260712",
+    "torch>=2.13.0",
+    "open-clip-torch>=3.3.0",
 ]
 ml = [
     "jupyter>=1.1",
