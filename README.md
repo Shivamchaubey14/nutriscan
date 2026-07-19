@@ -7,6 +7,19 @@ cuisine first (poha, dal tadka, idli sambar…), with Western dishes supported v
 > 🚧 Work in progress — being built as a production-grade ML system: versioned models,
 > automated retraining, CI/CD with model-quality gates, and drift monitoring.
 
+## Status
+
+- **Label set frozen**: 59 classes (Indian dishes + produce + common Western dishes),
+  validated by a 5-source data audit ([`ml/labels.yaml`](ml/labels.yaml)).
+- **Dataset v1 frozen**: 27,860 images, 58 classes — train 23,122 / val 2,658 /
+  test 1,944, deterministic content-hash split ([`ml/manifests/`](ml/manifests/)).
+  Thin classes backfilled by web scraping with a zero-shot CLIP junk filter.
+- **Nutrition DB seeded**: MySQL schema with all 542 IFCT 2017 foods + USDA FNDDS
+  survey foods, every vision class mapped to a food id with household portions
+  (katori/piece/glass in grams) — [`backend/db/`](backend/db/).
+- **CI gate live**: branch protection with required lint + type + test + Docker
+  builds; every change lands via PR.
+
 ## Why
 
 Single-image calorie estimation has irreducible error (hidden oil, sauces, density), and most
