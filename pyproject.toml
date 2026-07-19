@@ -21,6 +21,7 @@ dev = [
     "types-requests>=2.33.0.20260712",
     "torch>=2.13.0",
     "open-clip-torch>=3.3.0",
+    "mlflow>=3.14.0",
 ]
 ml = [
     "jupyter>=1.1",
