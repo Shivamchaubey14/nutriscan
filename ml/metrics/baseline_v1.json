@@ -1,0 +1,8 @@
+{
+  "model": "efficientnet_v2_s frozen + linear head",
+  "dataset_version": 1,
+  "seed": 42,
+  "test_top1": 0.8606,
+  "test_top5": 0.9707,
+  "val_top1_best": 0.8691
+}
