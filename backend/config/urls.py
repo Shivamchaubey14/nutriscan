@@ -11,4 +11,5 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("api/v1/auth/", include("accounts.urls")),
     path("api/v1/scan/", include("scans.urls")),
     path("api/v1/log/", include("logs.urls")),
+    path("api/v1/foods/", include("nutrition.urls")),
 ]
