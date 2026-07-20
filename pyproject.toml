@@ -9,7 +9,11 @@ dependencies = [
     "django-redis>=7.0.0",
     "djangorestframework>=3.17.1",
     "djangorestframework-simplejwt>=5.5.1",
+    "fastapi>=0.139.2",
+    "onnxruntime>=1.19",
+    "pillow>=12.3.0",
     "pymysql>=1.2.0",
+    "python-multipart>=0.0.32",
     "types-pymysql>=1.1.0.20260518",
     "uvicorn[standard]>=0.51.0",
 ]
@@ -31,6 +35,7 @@ dev = [
     "pytest-django>=4.12.0",
     "django-stubs[compatible-mypy]>=6.0.7",
     "djangorestframework-stubs>=3.17.0",
+    "onnx>=1.22.0",
 ]
 ml = [
     "jupyter>=1.1",
@@ -58,6 +63,10 @@ select = [
     "SIM", # simplify
 ]
 
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI dependency markers are meant to be called in argument defaults.
+extend-immutable-calls = ["fastapi.File", "fastapi.Depends", "fastapi.Query"]
+
 [tool.mypy]
 python_version = "3.12"
 strict = true
@@ -73,5 +82,5 @@ django_settings_module = "config.settings"
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "backend/tests"]
-pythonpath = ["backend"]
+pythonpath = ["backend", "."]
 DJANGO_SETTINGS_MODULE = "config.settings"

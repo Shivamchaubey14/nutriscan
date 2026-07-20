@@ -38,3 +38,6 @@ jobs:
 
       - name: Build backend image
         run: docker build -f backend/Dockerfile -t nutriscan-backend:ci .
+
+      - name: Build inference image
+        run: docker build -f inference/Dockerfile -t nutriscan-inference:ci .

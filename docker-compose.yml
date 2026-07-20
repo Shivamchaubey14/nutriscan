@@ -44,5 +44,16 @@ services:
       redis:
         condition: service_started
 
+  inference:
+    build:
+      context: .
+      dockerfile: inference/Dockerfile
+    # ONNX weights are git-ignored; export them first (see inference/README.md),
+    # then this mount provides them to the container.
+    volumes:
+      - ./inference/models:/app/inference/models:ro
+    ports:
+      - "8001:8001"
+
 volumes:
   mysql_data:
