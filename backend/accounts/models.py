@@ -37,6 +37,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
+    daily_calorie_goal = models.PositiveIntegerField(default=2000)
 
     objects = UserManager()
 
