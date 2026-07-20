@@ -1,0 +1,14 @@
+.git/
+.venv/
+**/__pycache__/
+**/*.pyc
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+ml/data/
+ml/models/
+ml/manifests/
+mlruns/
+**/db.sqlite3
+docs/
+mobile/
