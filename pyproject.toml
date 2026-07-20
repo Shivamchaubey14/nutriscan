@@ -82,5 +82,5 @@ django_settings_module = "config.settings"
 
 [tool.pytest.ini_options]
 testpaths = ["tests", "backend/tests"]
-pythonpath = ["backend"]
+pythonpath = ["backend", "."]
 DJANGO_SETTINGS_MODULE = "config.settings"
