@@ -8,6 +8,7 @@
 ml/data/
 ml/models/
 ml/manifests/
+inference/models/*.onnx
 mlruns/
 **/db.sqlite3
 docs/
