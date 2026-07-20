@@ -107,6 +107,9 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
 
+INFERENCE_URL = os.environ.get("INFERENCE_URL", "http://localhost:8001")
+INFERENCE_TIMEOUT = float(os.environ.get("INFERENCE_TIMEOUT", "10"))
+
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
