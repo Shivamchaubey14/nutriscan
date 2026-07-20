@@ -4,7 +4,15 @@ version = "0.1.0"
 description = "Point. Scan. Know. — AI-powered food recognition and calorie estimation for Indian cuisine."
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "django>=5.2,<6",
+    "django-redis>=7.0.0",
+    "djangorestframework>=3.17.1",
+    "djangorestframework-simplejwt>=5.5.1",
+    "pymysql>=1.2.0",
+    "types-pymysql>=1.1.0.20260518",
+    "uvicorn[standard]>=0.51.0",
+]
 
 [dependency-groups]
 dev = [
@@ -12,8 +20,6 @@ dev = [
     "mypy>=1.13",
     "pytest>=8.3",
     "pre-commit>=4.0",
-    "pymysql>=1.2.0",
-    "types-pymysql>=1.1.0.20260518",
     "types-pyyaml>=6.0.12.20260518",
     "imagehash>=4.3.2",
     "ddgs>=9.14.4",
@@ -22,6 +28,9 @@ dev = [
     "torch>=2.13.0",
     "open-clip-torch>=3.3.0",
     "mlflow>=3.14.0",
+    "pytest-django>=4.12.0",
+    "django-stubs[compatible-mypy]>=6.0.7",
+    "djangorestframework-stubs>=3.17.0",
 ]
 ml = [
     "jupyter>=1.1",
@@ -37,6 +46,7 @@ ml = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+extend-exclude = ["**/migrations/**"]
 
 [tool.ruff.lint]
 select = [
@@ -51,6 +61,17 @@ select = [
 [tool.mypy]
 python_version = "3.12"
 strict = true
+plugins = ["mypy_django_plugin.main"]
+mypy_path = "backend"
+
+[[tool.mypy.overrides]]
+module = ["*.migrations.*"]
+ignore_errors = true
+
+[tool.django-stubs]
+django_settings_module = "config.settings"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "backend/tests"]
+pythonpath = ["backend"]
+DJANGO_SETTINGS_MODULE = "config.settings"
