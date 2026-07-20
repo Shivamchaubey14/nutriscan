@@ -9,4 +9,5 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("admin/", admin.site.urls),
     path("health/", HealthView.as_view(), name="health"),
     path("api/v1/auth/", include("accounts.urls")),
+    path("api/v1/scan/", include("scans.urls")),
 ]

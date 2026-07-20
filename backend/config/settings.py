@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "adrf",
     "accounts",
     "scans",
     "nutrition",
@@ -106,6 +107,9 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
+
+INFERENCE_URL = os.environ.get("INFERENCE_URL", "http://localhost:8001")
+INFERENCE_TIMEOUT = float(os.environ.get("INFERENCE_TIMEOUT", "10"))
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"

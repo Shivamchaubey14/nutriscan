@@ -36,12 +36,15 @@ services:
       MYSQL_HOST: db
       MYSQL_PORT: "3306"
       REDIS_URL: redis://redis:6379/0
+      INFERENCE_URL: http://inference:8001
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
       redis:
+        condition: service_started
+      inference:
         condition: service_started
 
   inference:
