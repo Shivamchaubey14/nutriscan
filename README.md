@@ -7,6 +7,44 @@ cuisine first (poha, dal tadka, idli sambar…), with Western dishes supported v
 > 🚧 Work in progress — being built as a production-grade ML system: versioned models,
 > automated retraining, CI/CD with model-quality gates, and drift monitoring.
 
+## Demo
+
+> 🎬 Demo GIF coming soon — recorded from `scripts/demo.sh` (add it as `docs/demo.gif`).
+
+**Live staging API:** _coming soon_ · run it yourself in 2 minutes → [Quickstart](#quickstart).
+
+`POST /api/v1/scan/` with a food photo returns a calorie **range**, never fake precision:
+
+```json
+{
+  "scan_id": "91c70862",
+  "model_version": "baseline_v1",
+  "needs_confirmation": false,
+  "items": [
+    {
+      "label": "pizza",
+      "confidence": 0.90,
+      "portion": { "unit": "slice", "grams": 110, "adjustable": true },
+      "nutrition": {
+        "kcal": { "min": 240, "max": 345 },
+        "protein_g": 12.5, "carbs_g": 36.7, "fat_g": 10.7, "source": "USDA"
+      }
+    }
+  ],
+  "candidates": [{ "label": "pizza", "confidence": 0.90 }, "…top-3"]
+}
+```
+
+## Quickstart
+
+```bash
+docker compose up -d --build                              # backend + inference + MySQL + Redis
+docker compose exec backend python manage.py seed_nutrition
+BASE_URL=http://localhost:8000 ./scripts/demo.sh ml/data/raw/food-101/images/pizza/1005649.jpg
+```
+
+Deploying to a public staging host? See [docs/DEPLOY.md](docs/DEPLOY.md).
+
 ## Status
 
 - **Label set frozen**: 59 classes (Indian dishes + produce + common Western dishes),
@@ -17,6 +55,10 @@ cuisine first (poha, dal tadka, idli sambar…), with Western dishes supported v
 - **Nutrition DB seeded**: MySQL schema with all 542 IFCT 2017 foods + USDA FNDDS
   survey foods, every vision class mapped to a food id with household portions
   (katori/piece/glass in grams) — [`backend/db/`](backend/db/).
+- **Baseline classifier**: EfficientNetV2-S, **86% top-1 / 97% top-5** on the frozen
+  test set, exported to ONNX and served under ~130 ms/image on CPU.
+- **Vertical slice working**: authenticated `POST /scan/` runs photo → inference service
+  (async `httpx`) → nutrition lookup → calorie range, end to end across the compose stack.
 - **CI gate live**: branch protection with required lint + type + test + Docker
   builds; every change lands via PR.
 
