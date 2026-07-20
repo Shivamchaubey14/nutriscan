@@ -1,0 +1,48 @@
+# Local dev stack: Django backend + MySQL 8 + Redis 7.
+# Host ports are offset (3307/6380) so they don't clash with a local MySQL/Redis.
+#   docker compose up --build   ->   http://localhost:8000/health/
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:-nutriscan}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-nutriscan}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_PASSWORD:-nutriscan}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7
+    ports:
+      - "6380:6379"
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-insecure-secret-key-not-for-production-use-only}
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "*"
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-nutriscan}
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-nutriscan}
+      MYSQL_HOST: db
+      MYSQL_PORT: "3306"
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+volumes:
+  mysql_data:
