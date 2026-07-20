@@ -43,8 +43,10 @@ class Classifier:
 
 
 def load_classifier() -> Classifier:
+    # fp32 is the default: dynamic INT8 quantization measured ~18x slower on this
+    # conv-heavy backbone (see inference/benchmark.json), so we serve fp32.
     model_path = Path(
-        os.environ.get("INFERENCE_MODEL_PATH", str(MODELS_DIR / "classifier_v1.int8.onnx"))
+        os.environ.get("INFERENCE_MODEL_PATH", str(MODELS_DIR / "classifier_v1.onnx"))
     )
     classes_path = Path(os.environ.get("INFERENCE_CLASSES_PATH", str(MODELS_DIR / "classes.json")))
     classes: list[str] = json.loads(classes_path.read_text(encoding="utf-8"))
