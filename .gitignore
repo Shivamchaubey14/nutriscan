@@ -22,6 +22,7 @@ node_modules/
 # ML artifacts & data (versioned via DVC later, not git)
 ml/data/
 ml/models/
+inference/models/*.onnx
 # regenerable via prepare_data.py (seed + content hash recorded in dataset_v1.json);
 # too large for the pre-commit size hook
 ml/manifests/train_v1.csv
