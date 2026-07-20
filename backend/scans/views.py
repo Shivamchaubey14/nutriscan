@@ -6,20 +6,23 @@ cache work is wrapped in sync_to_async so a slow model call never blocks the wor
 
 import httpx
 from accounts.models import User
-from adrf.views import APIView  # type: ignore[import-untyped]
+from adrf.views import APIView as AsyncAPIView  # type: ignore[import-untyped]
 from asgiref.sync import sync_to_async
 from nutrition.resolver import resolve_nutrition
+from rest_framework.generics import get_object_or_404
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from scans.inference_client import classify
 from scans.models import Scan
+from scans.serializers import FeedbackSerializer, ScanSerializer
 
 # FR-3: below this confidence the app should ask the user to confirm the dish.
 CONFIDENCE_THRESHOLD = 0.55
 
 
-class ScanView(APIView):  # type: ignore[misc]
+class ScanView(AsyncAPIView):  # type: ignore[misc]
     async def post(self, request: Request) -> Response:
         upload = request.FILES.get("image")
         if upload is None:
@@ -64,3 +67,16 @@ class ScanView(APIView):  # type: ignore[misc]
                 ],
             }
         )
+
+
+class FeedbackView(APIView):
+    """FR-15/16: confirm or correct a scan's label; corrections feed retraining."""
+
+    def post(self, request: Request, scan_id: str) -> Response:
+        scan = get_object_or_404(Scan, id=scan_id, user=request.user)
+        serializer = FeedbackSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        scan.confirmed = serializer.validated_data["confirmed"]
+        scan.corrected_label = serializer.validated_data.get("corrected_label", "")
+        scan.save(update_fields=["confirmed", "corrected_label"])
+        return Response(ScanSerializer(scan).data)
