@@ -26,9 +26,6 @@ export const HomeScreen = () => (
 export const HistoryScreen = () => (
   <Placeholder title="History" subtitle="Past days, weekly totals, and edits to logged meals." />
 );
-export const ScanScreen = () => (
-  <Placeholder title="Scan" subtitle="Point your camera at a plate to identify it and estimate calories." />
-);
 export const PlanScreen = () => (
   <Placeholder title="Plan" subtitle="Per-meal calorie budgets and ideas that fit what's left." />
 );
