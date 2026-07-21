@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { useTheme } from '../theme/ThemeProvider';
 
@@ -11,28 +11,24 @@ interface ChipProps {
 
 export function Chip({ label, variant = 'neutral' }: ChipProps) {
   const { colors, radii, spacing, typography } = useTheme();
-  const dot = {
-    high: colors.success,
-    medium: colors.warning,
-    low: colors.error,
-    neutral: colors.caption,
+  const style = {
+    high: { bg: colors.sageSoft, fg: colors.onSage },
+    medium: { bg: colors.accentSoft, fg: colors.onAccent },
+    low: { bg: colors.errorSoft, fg: colors.error },
+    neutral: { bg: colors.cardMuted, fg: colors.caption },
   }[variant];
 
   return (
     <View
       style={{
-        flexDirection: 'row',
-        alignItems: 'center',
         alignSelf: 'flex-start',
-        gap: spacing.xs,
-        backgroundColor: dot + '22', // soft tint; text stays heading-colored for AA contrast
+        backgroundColor: style.bg,
         borderRadius: radii.chip,
         paddingVertical: spacing.xs,
         paddingHorizontal: spacing.m,
       }}
     >
-      <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: dot }} />
-      <Text style={[typography.caption, { color: colors.heading }]}>{label}</Text>
+      <Text style={[typography.caption, { color: style.fg }]}>{label}</Text>
     </View>
   );
 }
