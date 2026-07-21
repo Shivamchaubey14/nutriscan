@@ -1,6 +1,8 @@
 /**
- * Design tokens — the warm sage-green & cream system (docs/design/DESIGN.md),
- * with the type scale, spacing, radii and shadows from SRS §8.
+ * Design tokens — the warm sage-green & cream system, sampled from the canonical
+ * screen mockups (docs/design/). Two greens carry the identity: a deep olive for
+ * buttons/primary actions, and a lighter sage for the scan FAB, progress rings
+ * and high-confidence. Tan (+ soft tan) handles over-goal and source badges.
  */
 import type { TextStyle, ViewStyle } from 'react-native';
 
@@ -52,23 +54,23 @@ export type ShadowLevel = 'light' | 'medium' | 'large';
 
 export const shadows: Record<ShadowLevel, ViewStyle> = {
   light: {
-    shadowColor: '#0F172A',
+    shadowColor: '#2F3427',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 3,
   },
   medium: {
-    shadowColor: '#0F172A',
+    shadowColor: '#2F3427',
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.12,
-    shadowRadius: 25,
+    shadowOpacity: 0.14,
+    shadowRadius: 22,
     elevation: 6,
   },
   large: {
-    shadowColor: '#0F172A',
+    shadowColor: '#2F3427',
     shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.16,
+    shadowOpacity: 0.18,
     shadowRadius: 40,
     elevation: 12,
   },
@@ -77,53 +79,62 @@ export const shadows: Record<ShadowLevel, ViewStyle> = {
 export interface Palette {
   background: string;
   card: string;
+  cardMuted: string;
   border: string;
   heading: string;
   body: string;
   caption: string;
-  primary: string;
-  primaryMuted: string;
+  primary: string; // deep olive — buttons, primary actions
   onPrimary: string;
-  accent: string;
+  sage: string; // lighter sage — FAB, progress ring, high confidence
+  sageSoft: string; // fills: high chip, within-goal bars
+  onSage: string;
+  accent: string; // tan — over goal, medium confidence
+  accentSoft: string; // fills: source badges, medium chip
   onAccent: string;
-  success: string;
-  warning: string;
-  error: string;
-  olive: string;
+  error: string; // terracotta — low confidence, failures
+  errorSoft: string;
+  olive: string; // dark camera/olive surfaces
 }
 
 export const lightPalette: Palette = {
   background: '#F4EEE1',
-  card: '#FFFDF6',
-  border: '#E8E1D2',
-  heading: '#35392E',
-  body: '#6B6A5E',
-  caption: '#A8A395',
-  primary: '#8A9B7D',
-  primaryMuted: '#AEBB9C',
-  onPrimary: '#FFFDF6',
-  accent: '#C9A16B',
-  onAccent: '#35392E',
-  success: '#8A9B7D',
-  warning: '#C9A16B',
+  card: '#FFFDF7',
+  cardMuted: '#EDE6D6',
+  border: '#E7E0D0',
+  heading: '#2F3427',
+  body: '#6C6B5E',
+  caption: '#9C978A',
+  primary: '#6E7C58',
+  onPrimary: '#FBF9F1',
+  sage: '#8CA079',
+  sageSoft: '#D8E1C9',
+  onSage: '#2F3427',
+  accent: '#C6A06B',
+  accentSoft: '#EBDBC0',
+  onAccent: '#5A4A2E',
   error: '#C97B5D',
+  errorSoft: '#F1DACE',
   olive: '#3B4433',
 };
 
 export const darkPalette: Palette = {
-  background: '#20261C',
-  card: '#2C3326',
-  border: '#3B4333',
-  heading: '#F2EFE4',
-  body: '#C7C4B5',
-  caption: '#8C8A7B',
-  primary: '#A9BB95',
-  primaryMuted: '#7E8E6F',
-  onPrimary: '#20261C',
+  background: '#1F241B',
+  card: '#2A3125',
+  cardMuted: '#333B2C',
+  border: '#3C4433',
+  heading: '#F1EEE3',
+  body: '#C6C4B4',
+  caption: '#8E8B7C',
+  primary: '#8CA079',
+  onPrimary: '#1B2016',
+  sage: '#9DB187',
+  sageSoft: '#3A4630',
+  onSage: '#F1EEE3',
   accent: '#D2AE7C',
-  onAccent: '#20261C',
-  success: '#A9BB95',
-  warning: '#D2AE7C',
-  error: '#D5896B',
-  olive: '#3B4433',
+  accentSoft: '#463B27',
+  onAccent: '#F1EEE3',
+  error: '#D68C6E',
+  errorSoft: '#4A342B',
+  olive: '#2A3125',
 };

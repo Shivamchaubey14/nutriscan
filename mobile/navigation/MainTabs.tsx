@@ -35,14 +35,14 @@ function ScanFab({ onPress, accessibilityState }: BottomTabBarButtonProps) {
             width: 58,
             height: 58,
             borderRadius: 29,
-            backgroundColor: colors.primary,
+            backgroundColor: colors.sage,
             justifyContent: 'center',
             alignItems: 'center',
           },
           shadows.medium,
         ]}
       >
-        <Ionicons name="add" size={30} color={colors.onPrimary} />
+        <Ionicons name="scan-outline" size={28} color={colors.onSage} />
       </View>
     </Pressable>
   );

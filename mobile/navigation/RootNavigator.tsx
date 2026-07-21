@@ -4,9 +4,9 @@ import {
   NavigationContainer,
   type Theme as NavTheme,
 } from '@react-navigation/native';
-import { ActivityIndicator, View } from 'react-native';
 
 import { useAuth } from '../auth/AuthProvider';
+import { SplashScreen } from '../screens/SplashScreen';
 import { useTheme } from '../theme/ThemeProvider';
 import { AuthStack } from './AuthStack';
 import { MainTabs } from './MainTabs';
@@ -28,11 +28,7 @@ export function RootNavigator() {
   };
 
   if (status === 'loading') {
-    return (
-      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center' }}>
-        <ActivityIndicator color={colors.primary} />
-      </View>
-    );
+    return <SplashScreen />;
   }
 
   const signedIn = status === 'authenticated' || status === 'guest';

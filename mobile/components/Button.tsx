@@ -22,9 +22,13 @@ export function Button({ label, variant = 'primary', disabled, style, ...rest }:
   const background = isSecondary
     ? colors.card
     : variant === 'success'
-      ? colors.success
+      ? colors.sage
       : colors.primary;
-  const foreground = isSecondary ? colors.primary : colors.onPrimary;
+  const foreground = isSecondary
+    ? colors.primary
+    : variant === 'success'
+      ? colors.onSage
+      : colors.onPrimary;
 
   return (
     <Pressable
