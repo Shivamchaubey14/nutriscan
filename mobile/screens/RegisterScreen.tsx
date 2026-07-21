@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ApiError } from '../api/client';
 import { useAuth } from '../auth/AuthProvider';
 import { AppText } from '../components/AppText';
+import { BrandMark } from '../components/BrandMark';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { useTheme } from '../theme/ThemeProvider';
@@ -37,6 +38,7 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView contentContainerStyle={{ padding: spacing.xl, gap: spacing.xl, flexGrow: 1, justifyContent: 'center' }}>
+          <BrandMark size={52} />
           <View style={{ gap: spacing.xs }}>
             <AppText variant="display" tone="heading">
               Create account
