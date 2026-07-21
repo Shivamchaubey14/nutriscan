@@ -65,9 +65,35 @@ More moving parts, autoscaling, no VM to babysit.
    ```
 4. Run `seed_nutrition` once (a one-off Cloud Run job or `gcloud run jobs`).
 
+## Continuous deployment
+
+`.github/workflows/cd.yml` runs on every merge to `main`:
+
+1. **build-and-push** (always) — builds the backend + inference images and pushes
+   them to GHCR tagged with the commit SHA and `latest`. Uses the built-in
+   `GITHUB_TOKEN`, so this works with no extra setup.
+2. **deploy-staging** → **smoke-test** → **deploy-production** (gated) — each
+   activates once you configure the target below. Production sits behind a manual
+   approval gate (the `production` GitHub Environment).
+
+To turn on auto-deploy to a VM (Option A above), set these on the repo:
+
+| Kind | Name | Value |
+|------|------|-------|
+| Variable | `STAGING_HOST` / `STAGING_USER` | VM host + SSH user |
+| Variable | `STAGING_URL` | public API root (enables the smoke test) |
+| Secret | `STAGING_SSH_KEY` | private key for the VM |
+| Variable/Secret | `PROD_HOST` / `PROD_USER` / `PROD_SSH_KEY` | same for production |
+
+The VM must have the repo cloned at `~/nutriscan` and a `.env` in place (see
+Option A). The deploy step pulls the SHA-tagged images and restarts the stack.
+
+**Rollback**: redeploy a previous commit's images —
+`TAG=<previous-sha> docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-build`
+on the host (or re-run the workflow from that commit).
+
 ## Production checklist
 
 - `DJANGO_DEBUG=0` and a real `DJANGO_ALLOWED_HOSTS` (never `*`).
 - A strong, secret `DJANGO_SECRET_KEY` (from a secret manager, not `.env` in git).
 - TLS in front of the backend.
-- Rollback = redeploy the previous image SHA (automated in the Day-12 CD pipeline).
