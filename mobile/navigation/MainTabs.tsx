@@ -5,8 +5,9 @@ import {
 } from '@react-navigation/bottom-tabs';
 import { Pressable, View } from 'react-native';
 
-import { HistoryScreen, HomeScreen, PlanScreen, ScanScreen } from '../screens/Placeholder';
+import { HistoryScreen, HomeScreen, PlanScreen } from '../screens/Placeholder';
 import { ProfileScreen } from '../screens/ProfileScreen';
+import { ScanScreen } from '../screens/ScanScreen';
 import { useTheme } from '../theme/ThemeProvider';
 import type { MainTabParamList } from './types';
 
