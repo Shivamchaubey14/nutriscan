@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ApiError } from '../api/client';
@@ -10,20 +10,13 @@ import { scanImage, type ScanResponse } from '../api/scan';
 import { useAuth } from '../auth/AuthProvider';
 import { AppText } from '../components/AppText';
 import { Button } from '../components/Button';
-import { Chip } from '../components/Chip';
+import { ScanResultSheet } from '../components/ScanResultSheet';
 import { useTheme } from '../theme/ThemeProvider';
 
 type Status = 'camera' | 'processing' | 'done' | 'failed';
 
 const GROUND = '#2C3327';
 const OVERLAY = 'rgba(255,255,255,0.14)';
-
-function confidenceChip(confidence: number): { label: string; variant: 'high' | 'medium' | 'low' } {
-  const pct = Math.round(confidence * 100);
-  if (confidence >= 0.75) return { label: `High · ${pct}%`, variant: 'high' };
-  if (confidence >= 0.55) return { label: `Medium · ${pct}%`, variant: 'medium' };
-  return { label: `Low · ${pct}%`, variant: 'low' };
-}
 
 function Corners() {
   const size = 34;
@@ -225,94 +218,17 @@ export function ScanScreen() {
       </CameraView>
 
       {(status === 'done' || status === 'failed') && (
-        <ResultSheet
+        <ScanResultSheet
           status={status}
           result={result}
           error={error}
+          token={accessToken}
           onDismiss={() => {
             setStatus('camera');
             setResult(null);
           }}
         />
       )}
-    </View>
-  );
-}
-
-function ResultSheet({
-  status,
-  result,
-  error,
-  onDismiss,
-}: {
-  status: Status;
-  result: ScanResponse | null;
-  error: string | null;
-  onDismiss: () => void;
-}) {
-  const { colors, spacing, radii, shadows } = useTheme();
-  return (
-    <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
-      <View
-        style={[
-          {
-            backgroundColor: colors.card,
-            borderTopLeftRadius: radii.sheet,
-            borderTopRightRadius: radii.sheet,
-            padding: spacing.xl,
-            gap: spacing.m,
-          },
-          shadows.large,
-        ]}
-      >
-        <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: colors.border, alignSelf: 'center' }} />
-
-        {status === 'failed' ? (
-          <>
-            <AppText variant="title" tone="heading">
-              Scan failed
-            </AppText>
-            <AppText variant="body" tone="body">
-              {error ?? 'Something went wrong.'}
-            </AppText>
-            <Button label="Try again" onPress={onDismiss} />
-          </>
-        ) : (
-          <ScrollView style={{ maxHeight: 360 }} contentContainerStyle={{ gap: spacing.m }}>
-            <AppText variant="caption" tone="caption">
-              {(result?.items.length ?? 0) > 0
-                ? `DETECTED · ${result?.model_version}`
-                : 'NO CONFIDENT MATCH'}
-            </AppText>
-            {result?.items.map((item) => {
-              const chip = confidenceChip(item.confidence);
-              return (
-                <View key={item.label} style={{ gap: spacing.xs }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <AppText variant="title" tone="heading">
-                      {item.label.replace(/_/g, ' ')}
-                    </AppText>
-                    <Chip label={chip.label} variant={chip.variant} />
-                  </View>
-                  <AppText variant="h2" tone="sage">
-                    {item.nutrition.kcal.min}–{item.nutrition.kcal.max} kcal
-                  </AppText>
-                  <AppText variant="secondary" tone="body">
-                    {item.portion.unit} · {item.portion.grams} g · P {item.nutrition.protein_g} · C{' '}
-                    {item.nutrition.carbs_g} · F {item.nutrition.fat_g} · {item.nutrition.source}
-                  </AppText>
-                </View>
-              );
-            })}
-            {result?.needs_confirmation ? (
-              <AppText variant="secondary" tone="body">
-                Not fully sure — you'll be able to pick from the top matches next.
-              </AppText>
-            ) : null}
-            <Button label="Scan another" variant="secondary" onPress={onDismiss} />
-          </ScrollView>
-        )}
-      </View>
     </View>
   );
 }

@@ -38,13 +38,24 @@ class ScanView(AsyncAPIView):  # type: ignore[misc]
         if not predictions:
             return Response({"detail": "no prediction"}, status=422)
 
-        top = predictions[0]
-        nutrition = await sync_to_async(resolve_nutrition)(top["label"])
+        # Resolve nutrition once per prediction; reused for both the top item and
+        # the candidate list so a low-confidence correction already carries the
+        # corrected dish's portion + calories (no second round trip on the phone).
+        resolved = [(p, await sync_to_async(resolve_nutrition)(p["label"])) for p in predictions]
+
+        top, top_nutrition = resolved[0]
         items = []
-        if nutrition is not None:
+        if top_nutrition is not None:
             items.append(
-                {"label": top["label"], "confidence": round(top["confidence"], 4), **nutrition}
+                {"label": top["label"], "confidence": round(top["confidence"], 4), **top_nutrition}
             )
+
+        candidates = []
+        for pred, nutrition in resolved:
+            candidate = {"label": pred["label"], "confidence": round(pred["confidence"], 4)}
+            if nutrition is not None:
+                candidate.update(nutrition)
+            candidates.append(candidate)
 
         model_version = result.get("model_version", "unknown")
         assert isinstance(request.user, User)  # guaranteed by IsAuthenticated
@@ -61,10 +72,7 @@ class ScanView(AsyncAPIView):  # type: ignore[misc]
                 "model_version": model_version,
                 "needs_confirmation": top["confidence"] < CONFIDENCE_THRESHOLD,
                 "items": items,
-                "candidates": [
-                    {"label": p["label"], "confidence": round(p["confidence"], 4)}
-                    for p in predictions
-                ],
+                "candidates": candidates,
             }
         )
 
