@@ -9,6 +9,8 @@ export interface UserProfile {
   id: number;
   email: string;
   date_joined?: string;
+  daily_calorie_goal: number;
+  data_consent: boolean;
 }
 
 export const register = (email: string, password: string) =>
@@ -28,3 +30,8 @@ export const refreshAccess = (refresh: string) =>
 
 export const fetchMe = (token: string) =>
   apiRequest<UserProfile>('/api/v1/auth/me/', { token });
+
+export const updateProfile = (
+  token: string,
+  body: Partial<Pick<UserProfile, 'daily_calorie_goal' | 'data_consent'>>
+) => apiRequest<UserProfile>('/api/v1/auth/me/', { method: 'PATCH', body, token });

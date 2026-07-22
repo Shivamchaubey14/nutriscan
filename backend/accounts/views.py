@@ -1,7 +1,4 @@
 from rest_framework import generics, permissions
-from rest_framework.request import Request
-from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from accounts.models import User
 from accounts.serializers import RegisterSerializer, UserSerializer
@@ -13,8 +10,11 @@ class RegisterView(generics.CreateAPIView[User]):
     permission_classes = [permissions.AllowAny]
 
 
-class MeView(APIView):
-    def get(self, request: Request) -> Response:
-        user = request.user
-        assert isinstance(user, User)  # guaranteed by IsAuthenticated
-        return Response(UserSerializer(user).data)
+class MeView(generics.RetrieveUpdateAPIView[User]):
+    """GET the current user; PATCH the daily calorie goal / data-contribution consent."""
+
+    serializer_class = UserSerializer
+
+    def get_object(self) -> User:
+        assert isinstance(self.request.user, User)  # guaranteed by IsAuthenticated
+        return self.request.user
