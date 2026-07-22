@@ -3,7 +3,7 @@ import { Text, type TextProps } from 'react-native';
 import { useTheme } from '../theme/ThemeProvider';
 import type { TypographyVariant } from '../theme/tokens';
 
-type Tone = 'heading' | 'body' | 'caption' | 'primary' | 'onPrimary' | 'sage';
+type Tone = 'heading' | 'body' | 'caption' | 'primary' | 'onPrimary' | 'sage' | 'error';
 
 interface AppTextProps extends TextProps {
   variant?: TypographyVariant;

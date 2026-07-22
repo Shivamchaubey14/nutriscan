@@ -18,6 +18,10 @@ class RegisterSerializer(serializers.ModelSerializer[User]):
 
 
 class UserSerializer(serializers.ModelSerializer[User]):
+    # Bounded so a typo can't set an absurd goal that skews every "remaining" calc.
+    daily_calorie_goal = serializers.IntegerField(min_value=800, max_value=8000, required=False)
+
     class Meta:
         model = User
-        fields = ("id", "email", "date_joined")
+        fields = ("id", "email", "date_joined", "daily_calorie_goal", "data_consent")
+        read_only_fields = ("id", "email", "date_joined")

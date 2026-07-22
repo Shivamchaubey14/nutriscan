@@ -38,6 +38,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     daily_calorie_goal = models.PositiveIntegerField(default=2000)
+    # NFR-5: opt-in to contributing scans/corrections back for model improvement.
+    data_consent = models.BooleanField(default=False)
 
     objects = UserManager()
 
