@@ -19,6 +19,39 @@ function clampGoal(value: number): number {
   return Math.max(GOAL_MIN, Math.min(GOAL_MAX, value));
 }
 
+// Top-level so its identity is stable across renders (no remount on each tap).
+function GoalStepButton({
+  label,
+  accessibilityLabel,
+  onPress,
+}: {
+  label: string;
+  accessibilityLabel: string;
+  onPress: () => void;
+}) {
+  const { colors } = useTheme();
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      style={{
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        borderWidth: 1.5,
+        borderColor: colors.primary,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <AppText variant="h3" tone="primary">
+        {label}
+      </AppText>
+    </Pressable>
+  );
+}
+
 export function ProfileScreen() {
   const { email, status, accessToken, logout } = useAuth();
   const toggle = useThemeToggle();
@@ -80,27 +113,6 @@ export function ProfileScreen() {
     }
   };
 
-  const StepButton = ({ delta, label }: { delta: number; label: string }) => (
-    <Pressable
-      onPress={() => setGoal((g) => clampGoal(g + delta))}
-      accessibilityRole="button"
-      accessibilityLabel={delta < 0 ? 'Decrease goal' : 'Increase goal'}
-      style={{
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        borderWidth: 1.5,
-        borderColor: colors.primary,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <AppText variant="h3" tone="primary">
-        {label}
-      </AppText>
-    </Pressable>
-  );
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={{ flex: 1, padding: spacing.xl, gap: spacing.l }}>
@@ -141,7 +153,11 @@ export function ProfileScreen() {
                   DAILY CALORIE GOAL
                 </AppText>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <StepButton delta={-GOAL_STEP} label="−" />
+                  <GoalStepButton
+                    label="−"
+                    accessibilityLabel="Decrease goal"
+                    onPress={() => setGoal((g) => clampGoal(g - GOAL_STEP))}
+                  />
                   <View style={{ alignItems: 'center' }}>
                     <AppText variant="h1" tone="heading">
                       {thousands(goal)}
@@ -150,7 +166,11 @@ export function ProfileScreen() {
                       kcal / day
                     </AppText>
                   </View>
-                  <StepButton delta={GOAL_STEP} label="+" />
+                  <GoalStepButton
+                    label="+"
+                    accessibilityLabel="Increase goal"
+                    onPress={() => setGoal((g) => clampGoal(g + GOAL_STEP))}
+                  />
                 </View>
                 {goal !== savedGoal ? (
                   <Button
