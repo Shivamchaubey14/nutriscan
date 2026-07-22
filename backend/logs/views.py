@@ -31,19 +31,38 @@ class MealLogListCreate(generics.ListCreateAPIView[MealLog]):
         serializer.save(user=self.request.user)
 
 
+class MealLogDetail(generics.RetrieveDestroyAPIView[MealLog]):
+    """Retrieve or delete a single entry — scoped to its owner (404 for others)."""
+
+    serializer_class = MealLogSerializer
+
+    def get_queryset(self) -> QuerySet[MealLog]:
+        assert isinstance(self.request.user, User)
+        return MealLog.objects.filter(user=self.request.user)
+
+
 class DailySummaryView(APIView):
     def get(self, request: Request) -> Response:
         assert isinstance(request.user, User)
         date_param = request.query_params.get("date")
         day = parse_date(date_param) if date_param else timezone.now().date()
         logs = MealLog.objects.filter(user=request.user, logged_at__date=day)
-        total: int = logs.aggregate(total=Sum("kcal"))["total"] or 0
+        totals = logs.aggregate(
+            kcal=Sum("kcal"),
+            protein=Sum("protein_g"),
+            carbs=Sum("carbs_g"),
+            fat=Sum("fat_g"),
+        )
+        total: int = totals["kcal"] or 0
         goal = request.user.daily_calorie_goal
         summary: dict[str, Any] = {
             "date": str(day),
             "total_kcal": total,
             "goal": goal,
             "remaining": goal - total,
+            "protein_g": float(totals["protein"] or 0),
+            "carbs_g": float(totals["carbs"] or 0),
+            "fat_g": float(totals["fat"] or 0),
             "count": logs.count(),
         }
         return Response(summary)

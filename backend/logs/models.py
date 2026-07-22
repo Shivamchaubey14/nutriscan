@@ -18,6 +18,11 @@ class MealLog(models.Model):
     label = models.CharField(max_length=64)
     kcal = models.PositiveIntegerField()
     portion_grams = models.DecimalField(max_digits=7, decimal_places=1)
+    # Captured at log time (the scan sheet already computes them) so daily
+    # summaries can total macros without re-resolving each label.
+    protein_g = models.DecimalField(max_digits=6, decimal_places=1, default=0)
+    carbs_g = models.DecimalField(max_digits=6, decimal_places=1, default=0)
+    fat_g = models.DecimalField(max_digits=6, decimal_places=1, default=0)
     logged_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
