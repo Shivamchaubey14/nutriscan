@@ -68,6 +68,7 @@ export function ScanResultSheet({ status, result, error, token, onDismiss }: Pro
   const [logging, setLogging] = useState(false);
   const [logged, setLogged] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const [noteIsError, setNoteIsError] = useState(false);
 
   const gramsFor = (item: ScanItem) => grams[item.label] ?? item.portion.grams;
   const setGramsFor = (label: string, value: number) =>
@@ -117,12 +118,12 @@ export function ScanResultSheet({ status, result, error, token, onDismiss }: Pro
     return sheet(
       <>
         <AppText variant="title" tone="heading">
-          Thanks — noted
+          {noteIsError ? 'Something went wrong' : 'Thanks — noted'}
         </AppText>
         <AppText variant="body" tone="body">
           {note}
         </AppText>
-        <Button label="Done" onPress={onDismiss} />
+        <Button label={noteIsError ? 'Try again' : 'Done'} onPress={onDismiss} />
       </>
     );
   }
@@ -162,6 +163,7 @@ export function ScanResultSheet({ status, result, error, token, onDismiss }: Pro
           nutrition: c.nutrition,
         });
       } else {
+        setNoteIsError(false);
         setNote(`We've recorded that it's ${titleCase(c.label)}. Nutrition for it is coming soon.`);
       }
     };
@@ -289,6 +291,7 @@ export function ScanResultSheet({ status, result, error, token, onDismiss }: Pro
       }
       setLogged(true);
     } catch (err) {
+      setNoteIsError(true);
       setNote(err instanceof ApiError ? err.message : "Couldn't save to your log.");
     } finally {
       setLogging(false);
