@@ -61,6 +61,7 @@ export function HomeScreen() {
       return;
     }
     try {
+      setLoading(true);
       setError(null);
       const nextSummary = await fetchSummary(accessToken);
       const nextMeals = await fetchLogs(accessToken, nextSummary.date);

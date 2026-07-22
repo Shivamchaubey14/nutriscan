@@ -98,6 +98,29 @@ def test_daily_summary_totals_vs_goal() -> None:
 
 
 @pytest.mark.django_db
+def test_meal_log_rejects_negative_macros() -> None:
+    client = _client(_user())
+    resp = client.post(
+        "/api/v1/log/",
+        {"label": "x", "kcal": 100, "portion_grams": "50", "protein_g": "-5"},
+        format="json",
+    )
+    assert resp.status_code == 400
+    assert "protein_g" in resp.json()
+
+
+@pytest.mark.django_db
+def test_summary_rejects_malformed_date() -> None:
+    client = _client(_user())
+    resp = client.get("/api/v1/log/summary/", {"date": "2026-99-99"})
+    assert resp.status_code == 400
+    assert "date" in resp.json()
+
+    # The list endpoint guards the same way.
+    assert client.get("/api/v1/log/", {"date": "not-a-date"}).status_code == 400
+
+
+@pytest.mark.django_db
 def test_meal_log_delete_is_user_scoped() -> None:
     user = _user()
     client = _client(user)

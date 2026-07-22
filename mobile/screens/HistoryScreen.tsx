@@ -65,6 +65,7 @@ export function HistoryScreen() {
       return;
     }
     try {
+      setLoading(true);
       setError(null);
       const [allLogs, summary] = await Promise.all([
         fetchLogs(accessToken),
@@ -224,6 +225,8 @@ export function HistoryScreen() {
                   <Pressable
                     onPress={() => void remove(entry.id)}
                     hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Delete ${titleCase(entry.label)}`}
                     style={{
                       width: 32,
                       height: 32,
