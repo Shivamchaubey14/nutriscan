@@ -78,7 +78,15 @@ def test_scan_returns_srs_shape(auth_client: APIClient, monkeypatch: pytest.Monk
     kcal = item["nutrition"]["kcal"]
     assert kcal["min"] < 310 < kcal["max"]  # point 310, ±band range
     assert item["nutrition"]["source"] == "USDA"
-    assert len(body["candidates"]) == 3
+
+    candidates = body["candidates"]
+    assert len(candidates) == 3
+    # The mapped candidate carries portion + nutrition (used by the low-confidence
+    # picker); unmapped candidates degrade to just label + confidence.
+    assert candidates[0]["label"] == "samosa"
+    assert candidates[0]["nutrition"]["source"] == "USDA"
+    assert candidates[0]["portion"]["unit"] == "piece"
+    assert "nutrition" not in candidates[1]  # kachori is unmapped
 
 
 @pytest.mark.django_db
