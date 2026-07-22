@@ -77,9 +77,12 @@ def test_meal_log_create_and_list_is_user_scoped() -> None:
 def test_daily_summary_totals_vs_goal() -> None:
     user = _user()
     client = _client(user)
+    macros = {"protein_g": "5", "carbs_g": "30", "fat_g": "2"}
     for kcal in (310, 96, 250):
         client.post(
-            "/api/v1/log/", {"label": "x", "kcal": kcal, "portion_grams": "100"}, format="json"
+            "/api/v1/log/",
+            {"label": "x", "kcal": kcal, "portion_grams": "100", **macros},
+            format="json",
         )
 
     summary = client.get("/api/v1/log/summary/")
@@ -89,6 +92,50 @@ def test_daily_summary_totals_vs_goal() -> None:
     assert body["goal"] == 2000
     assert body["remaining"] == 1344
     assert body["count"] == 3
+    assert body["protein_g"] == 15.0  # 3 × 5
+    assert body["carbs_g"] == 90.0
+    assert body["fat_g"] == 6.0
+
+
+@pytest.mark.django_db
+def test_meal_log_rejects_negative_macros() -> None:
+    client = _client(_user())
+    resp = client.post(
+        "/api/v1/log/",
+        {"label": "x", "kcal": 100, "portion_grams": "50", "protein_g": "-5"},
+        format="json",
+    )
+    assert resp.status_code == 400
+    assert "protein_g" in resp.json()
+
+
+@pytest.mark.django_db
+def test_summary_rejects_malformed_date() -> None:
+    client = _client(_user())
+    resp = client.get("/api/v1/log/summary/", {"date": "2026-99-99"})
+    assert resp.status_code == 400
+    assert "date" in resp.json()
+
+    # The list endpoint guards the same way.
+    assert client.get("/api/v1/log/", {"date": "not-a-date"}).status_code == 400
+
+
+@pytest.mark.django_db
+def test_meal_log_delete_is_user_scoped() -> None:
+    user = _user()
+    client = _client(user)
+    created = client.post(
+        "/api/v1/log/", {"label": "samosa", "kcal": 310, "portion_grams": "100"}, format="json"
+    )
+    log_id = created.json()["id"]
+
+    # A different user cannot delete it.
+    intruder = _client(_user("intruder@example.com"))
+    assert intruder.delete(f"/api/v1/log/{log_id}/").status_code == 404
+
+    # The owner can.
+    assert client.delete(f"/api/v1/log/{log_id}/").status_code == 204
+    assert client.get("/api/v1/log/").json() == []
 
 
 @pytest.mark.django_db

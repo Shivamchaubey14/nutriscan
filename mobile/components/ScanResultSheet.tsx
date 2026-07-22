@@ -6,6 +6,7 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { ApiError } from '../api/client';
 import { logMeal } from '../api/log';
 import { sendFeedback, type Candidate, type ScanItem, type ScanResponse } from '../api/scan';
+import { titleCase } from '../lib/format';
 import { useTheme } from '../theme/ThemeProvider';
 import { AppText } from './AppText';
 import { Button } from './Button';
@@ -20,12 +21,6 @@ interface Props {
   error: string | null;
   token: string | null;
   onDismiss: () => void;
-}
-
-function titleCase(label: string): string {
-  return label
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function round1(value: number): number {
@@ -284,6 +279,9 @@ export function ScanResultSheet({ status, result, error, token, onDismiss }: Pro
             label: item.label,
             kcal: Math.round((s.kcalMin + s.kcalMax) / 2),
             portion_grams: gramsFor(item),
+            protein_g: s.protein,
+            carbs_g: s.carbs,
+            fat_g: s.fat,
             scan: result?.scan_id ?? null,
           },
           token

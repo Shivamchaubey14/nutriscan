@@ -20,12 +20,6 @@ export function Placeholder({ title, subtitle }: { title: string; subtitle: stri
   );
 }
 
-export const HomeScreen = () => (
-  <Placeholder title="Home" subtitle="Your daily calorie ring and today's meals will live here." />
-);
-export const HistoryScreen = () => (
-  <Placeholder title="History" subtitle="Past days, weekly totals, and edits to logged meals." />
-);
 export const PlanScreen = () => (
   <Placeholder title="Plan" subtitle="Per-meal calorie budgets and ideas that fit what's left." />
 );
