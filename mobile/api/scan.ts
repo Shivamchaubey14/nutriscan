@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../config';
-import { ApiError } from './client';
+import { apiRequest, ApiError } from './client';
 
 export interface Portion {
   unit: string;
@@ -25,6 +25,10 @@ export interface ScanItem {
 export interface Candidate {
   label: string;
   confidence: number;
+  // Present when the label is mapped in the nutrition DB — lets a low-confidence
+  // correction show the picked dish's portion + calories without another request.
+  portion?: Portion;
+  nutrition?: Nutrition;
 }
 
 export interface ScanResponse {
@@ -56,4 +60,14 @@ export async function scanImage(uri: string, token: string): Promise<ScanRespons
     throw new ApiError(response.status, detail);
   }
   return data as ScanResponse;
+}
+
+export interface Feedback {
+  confirmed: boolean;
+  corrected_label?: string;
+}
+
+/** FR-15/16: confirm or correct a scan's label — corrections feed retraining. */
+export async function sendFeedback(scanId: string, body: Feedback, token: string): Promise<void> {
+  await apiRequest(`/api/v1/scan/${scanId}/feedback/`, { method: 'POST', body, token });
 }
