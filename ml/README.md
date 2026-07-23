@@ -30,9 +30,12 @@ real training runs on **Google Colab** (`notebooks/train_finetune_colab.ipynb`).
 
 Each run logs params + per-epoch metrics to MLflow and writes `metrics/<backbone>_v1.json` and
 `models/<backbone>_v1.pt`. The notebook prints a comparison and copies the artifacts back to
-`MyDrive/nutriscan/results`. Pick the production candidate by frozen-test Top-1; it must beat the
-**86.1%** baseline to be worth shipping. Pull the winning `.pt` + metrics back for the Day-8-style
-ONNX export.
+`MyDrive/nutriscan/results`.
+
+**Pick the production candidate by _validation_ Top-1**, not the frozen test — selecting on the
+test set contaminates it as a final measure. The winner's frozen-test Top-1 is then the single
+one-shot number to report, and it should beat the **86.1%** baseline to be worth shipping. Pull
+the winning `.pt` + metrics back for the Day-8-style ONNX export.
 
 Local smoke test (correctness only, not real accuracy):
 

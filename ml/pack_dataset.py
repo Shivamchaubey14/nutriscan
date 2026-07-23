@@ -35,21 +35,27 @@ def main() -> None:
     if PACK.exists():
         shutil.rmtree(PACK)
 
+    raw_root = RAW.resolve()
+    pack_root = PACK.resolve()
     copied = 0
     missing: list[str] = []
     for rel in sorted(paths):
-        src = RAW / rel
+        # Guard against absolute / "../" manifest entries escaping the dataset roots.
+        src = (RAW / rel).resolve()
+        if not src.is_relative_to(raw_root):
+            raise SystemExit(f"unsafe manifest path escapes ml/data/raw/: {rel!r}")
         if not src.exists():
             missing.append(rel)
             continue
-        dst = PACK / rel
+        dst = pack_root / src.relative_to(raw_root)
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dst)
         copied += 1
 
     print(f"packed {copied}/{len(paths)} images", flush=True)
     if missing:
-        print(f"WARNING: {len(missing)} referenced images missing (first 5: {missing[:5]})")
+        # Fail closed — an incomplete zip would silently train on fewer images.
+        raise SystemExit(f"{len(missing)} referenced images missing (first 5: {missing[:5]})")
 
     archive = shutil.make_archive(str(ZIP_BASE), "zip", root_dir=str(PACK))
     size_mb = Path(archive).stat().st_size / 1e6
