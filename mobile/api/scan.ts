@@ -20,6 +20,8 @@ export interface ScanItem {
   confidence: number;
   portion: Portion;
   nutrition: Nutrition;
+  // Present on multi-item scans: detector box [x1, y1, x2, y2] in image pixels.
+  box?: number[];
 }
 
 export interface Candidate {

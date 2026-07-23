@@ -44,8 +44,29 @@ class ScanView(AsyncAPIView):  # type: ignore[misc]
         resolved = [(p, await sync_to_async(resolve_nutrition)(p["label"])) for p in predictions]
 
         top, top_nutrition = resolved[0]
+        # FR-2 multi-item: when the detector found 2+ food regions, each region's
+        # top prediction becomes an item. Dedupe by label (two katoris of the same
+        # dal collapse to one adjustable portion) and skip unmapped labels.
         items = []
-        if top_nutrition is not None:
+        seen_labels: set[str] = set()
+        for region in result.get("regions", []):
+            region_top = region["predictions"][0]
+            label = region_top["label"]
+            if label in seen_labels:
+                continue
+            nutrition = await sync_to_async(resolve_nutrition)(label)
+            if nutrition is None:
+                continue
+            seen_labels.add(label)
+            items.append(
+                {
+                    "label": label,
+                    "confidence": round(region_top["confidence"], 4),
+                    "box": region["box"],
+                    **nutrition,
+                }
+            )
+        if not items and top_nutrition is not None:
             items.append(
                 {"label": top["label"], "confidence": round(top["confidence"], 4), **top_nutrition}
             )

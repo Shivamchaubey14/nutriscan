@@ -36,9 +36,15 @@ def _jpeg() -> SimpleUploadedFile:
     return SimpleUploadedFile("food.jpg", buf.getvalue(), content_type="image/jpeg")
 
 
-def _fake_classify(predictions: list[dict[str, Any]]) -> ClassifyFn:
+def _fake_classify(
+    predictions: list[dict[str, Any]], regions: list[dict[str, Any]] | None = None
+) -> ClassifyFn:
     async def _classify(image_bytes: bytes, filename: str, top_k: int = 3) -> dict[str, Any]:
-        return {"model_version": "baseline_v1", "predictions": predictions}
+        return {
+            "model_version": "baseline_v1",
+            "predictions": predictions,
+            "regions": regions or [],
+        }
 
     return _classify
 
@@ -87,6 +93,47 @@ def test_scan_returns_srs_shape(auth_client: APIClient, monkeypatch: pytest.Monk
     assert candidates[0]["nutrition"]["source"] == "USDA"
     assert candidates[0]["portion"]["unit"] == "piece"
     assert "nutrition" not in candidates[1]  # kachori is unmapped
+
+
+@pytest.mark.django_db
+def test_scan_multi_item_from_regions(
+    auth_client: APIClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """FR-2: 2+ detected regions become one item each; duplicates and unmapped skip."""
+    _seed_idli()
+
+    def region(box: list[int], score: float, label: str, conf: float) -> dict[str, Any]:
+        return {"box": box, "score": score, "predictions": [{"label": label, "confidence": conf}]}
+
+    regions = [
+        region([0, 0, 100, 100], 0.9, "samosa", 0.88),
+        region([120, 0, 220, 100], 0.8, "idli", 0.7),
+        region([0, 120, 100, 220], 0.7, "samosa", 0.6),  # duplicate label
+        region([120, 120, 220, 220], 0.6, "unmapped", 0.5),  # not in nutrition DB
+    ]
+    monkeypatch.setattr(
+        "scans.views.classify",
+        _fake_classify([{"label": "samosa", "confidence": 0.88}], regions=regions),
+    )
+    resp = auth_client.post("/api/v1/scan/", {"image": _jpeg()}, format="multipart")
+    assert resp.status_code == 200
+    items = resp.json()["items"]
+    # duplicate samosa collapsed, unmapped label skipped -> 2 items with boxes
+    assert [i["label"] for i in items] == ["samosa", "idli"]
+    assert items[0]["box"] == [0, 0, 100, 100]
+    assert items[1]["nutrition"]["kcal"]["min"] > 0
+
+
+def _seed_idli() -> None:
+    food = Food.objects.create(source="IFCT", source_id="idli1", name="Idli", food_group="cereal")
+    amounts = {"energy_kcal": "128", "protein_g": "4", "carb_g": "26", "fat_g": "1"}
+    for key, amount in amounts.items():
+        nutrient, _ = Nutrient.objects.get_or_create(
+            key_name=key, defaults={"display_name": key, "unit": "g"}
+        )
+        FoodNutrient.objects.create(food=food, nutrient=nutrient, amount_per_100g=amount)
+    vision_class = VisionClass.objects.create(label="idli", food=food, match_quality="exact")
+    PortionUnit.objects.create(vision_class=vision_class, unit="piece", grams="75", is_default=True)
 
 
 @pytest.mark.django_db
