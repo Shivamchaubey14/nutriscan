@@ -17,8 +17,8 @@ ml/metrics/<backbone>_v1.json to sit next to the baseline for comparison.
 This machine is CPU-only, so the real training runs on a cloud GPU (see
 ml/README.md → "Fine-tuning on a GPU"). Locally it is exercised as a smoke test:
 
-    uv run python ml/train_finetune.py --backbone effv2s --epochs 1 \
-        --limit 32 --batch-size 8 --num-workers 0 --mixup-alpha 0 --no-mlflow
+    uv run python ml/train_finetune.py --backbone effv2s --epochs 1 --limit 32 \
+        --batch-size 8 --num-workers 0 --mixup-alpha 0 --cutmix-alpha 0 --no-mlflow
 """
 
 from __future__ import annotations
@@ -162,6 +162,7 @@ def main() -> None:
     parser.add_argument("--weight-decay", type=float, default=0.05)
     parser.add_argument("--warmup-epochs", type=int, default=2)
     parser.add_argument("--mixup-alpha", type=float, default=0.2)
+    parser.add_argument("--cutmix-alpha", type=float, default=1.0)
     parser.add_argument("--label-smoothing", type=float, default=0.1)
     parser.add_argument("--num-workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
@@ -187,10 +188,11 @@ def main() -> None:
     data_cfg: dict[str, Any] = resolve_data_config({}, model=model)  # type: ignore[no-untyped-call]
     train_loader, val_loader, test_loader = build_loaders(class_to_idx, data_cfg, args)
 
-    mixup_on = args.mixup_alpha > 0 and not args.limit
+    mixup_on = (args.mixup_alpha > 0 or args.cutmix_alpha > 0) and not args.limit
     mixup_fn = (
         Mixup(  # type: ignore[no-untyped-call]
             mixup_alpha=args.mixup_alpha,
+            cutmix_alpha=args.cutmix_alpha,
             label_smoothing=args.label_smoothing,
             num_classes=len(classes),
         )
@@ -219,6 +221,7 @@ def main() -> None:
                 "weight_decay": args.weight_decay,
                 "warmup_epochs": args.warmup_epochs,
                 "mixup_alpha": args.mixup_alpha if mixup_on else 0.0,
+                "cutmix_alpha": args.cutmix_alpha if mixup_on else 0.0,
                 "label_smoothing": args.label_smoothing,
                 "n_classes": len(classes),
                 "device": device.type,

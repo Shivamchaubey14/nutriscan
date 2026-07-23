@@ -34,5 +34,5 @@ Local smoke test (correctness only, not real accuracy):
 
 ```bash
 python ml/train_finetune.py --backbone effv2s --epochs 1 --limit 32 \
-    --batch-size 8 --num-workers 0 --mixup-alpha 0 --no-mlflow
+    --batch-size 8 --num-workers 0 --mixup-alpha 0 --cutmix-alpha 0 --no-mlflow
 ```
