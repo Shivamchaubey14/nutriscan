@@ -8,13 +8,32 @@ small. The heavy torch/onnx tooling is only used offline to produce the model.
 
 | Method | Path       | Purpose                                             |
 |--------|------------|-----------------------------------------------------|
-| GET    | `/health`  | Liveness + whether the model is loaded              |
+| GET    | `/health`  | Liveness + whether the classifier / detector loaded |
 | POST   | `/predict` | `multipart/form-data` image → top-k labels + scores |
 
 ```bash
 curl -s -X POST http://localhost:8001/predict -F "image=@plate.jpg"
-# {"model_version":"baseline_v1","predictions":[{"label":"pizza","confidence":0.90}, ...]}
+# {"model_version":"baseline_v1","predictions":[{"label":"pizza","confidence":0.90}, ...],"regions":[]}
 ```
+
+## Multi-item detection (FR-2)
+
+A photo with several dishes (a thali) needs one label *per dish*. We have no
+bounding-box annotations for our 58 classes, so v1 does **not** fine-tune a
+detector: a stock COCO **YOLOv8n** proposes food-shaped regions (bowl, cup,
+pizza, fruit…) and the classifier names the dish inside each crop. When 2+
+regions are found, `/predict` adds a `regions` array (box + score + per-crop
+`predictions`); the backend turns those into a multi-item scan. Capped at 4
+items/frame (SRS risk table). With a single region, behaviour is unchanged.
+
+The detector ONNX is git-ignored and optional — without it the service runs in
+single-item mode. Produce it (COCO-pretrained, no training) with:
+
+```bash
+uv run python ml/export_detector.py   # -> inference/models/detector_v1.onnx (~13 MB)
+```
+
+Override its path with `INFERENCE_DETECTOR_PATH`.
 
 ## Producing the model (offline)
 

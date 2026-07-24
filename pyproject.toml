@@ -40,6 +40,7 @@ dev = [
     "django-stubs[compatible-mypy]>=6.0.7",
     "djangorestframework-stubs>=3.17.0",
     "onnx>=1.22.0",
+    "ultralytics>=8.3",
 ]
 ml = [
     "jupyter>=1.1",

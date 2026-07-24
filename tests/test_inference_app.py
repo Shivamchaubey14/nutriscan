@@ -45,12 +45,14 @@ def client(tmp_path_factory: pytest.TempPathFactory) -> Iterator[TestClient]:
 
     os.environ["INFERENCE_MODEL_PATH"] = str(onnx_path)
     os.environ["INFERENCE_CLASSES_PATH"] = str(classes_path)
+    # Force single-item mode: point the detector at a path that doesn't exist.
+    os.environ["INFERENCE_DETECTOR_PATH"] = str(model_dir / "no_detector.onnx")
     from inference.app import app
 
     with TestClient(app) as test_client:
         yield test_client
 
-    for key in ("INFERENCE_MODEL_PATH", "INFERENCE_CLASSES_PATH"):
+    for key in ("INFERENCE_MODEL_PATH", "INFERENCE_CLASSES_PATH", "INFERENCE_DETECTOR_PATH"):
         os.environ.pop(key, None)
 
 
@@ -63,7 +65,13 @@ def _jpeg() -> bytes:
 def test_health(client: TestClient) -> None:
     resp = client.get("/health")
     assert resp.status_code == 200
-    assert resp.json() == {"status": "ok", "model_loaded": True}
+    assert resp.json() == {"status": "ok", "model_loaded": True, "detector_loaded": False}
+
+
+def test_predict_has_no_regions_without_detector(client: TestClient) -> None:
+    resp = client.post("/predict", files={"image": ("food.jpg", _jpeg(), "image/jpeg")})
+    assert resp.status_code == 200
+    assert resp.json()["regions"] == []
 
 
 def test_predict_returns_ranked_labels(client: TestClient) -> None:
