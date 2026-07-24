@@ -282,7 +282,7 @@ export function ScanScreen() {
       </CameraView>
 
       {(status === 'done' || status === 'failed') &&
-        (product ? (
+        (mode === 'Barcode' ? (
           <ProductSheet
             status={status}
             product={product}

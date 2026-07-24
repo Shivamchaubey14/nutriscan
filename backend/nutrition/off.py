@@ -69,7 +69,10 @@ async def lookup_product(barcode: str) -> dict[str, Any] | None:
         response = await client.get(url, params={"fields": FIELDS})
     if response.status_code != 200:
         return None
-    body: dict[str, Any] = response.json()
+    try:
+        body: dict[str, Any] = response.json()
+    except ValueError:  # malformed / non-JSON 200 -> treat as "not found"
+        return None
     if body.get("status") != 1:
         return None
     return _shape(barcode, body.get("product", {}))

@@ -16,7 +16,7 @@ type Meal = (typeof MEALS)[number];
 
 interface Props {
   status: 'done' | 'failed';
-  product: Product;
+  product: Product | null;
   error: string | null;
   token: string | null;
   onDismiss: () => void;
@@ -28,7 +28,7 @@ function round1(value: number): number {
 
 export function ProductSheet({ status, product, error, token, onDismiss }: Props) {
   const { colors, spacing, radii, shadows } = useTheme();
-  const base = product.portion.grams;
+  const base = product?.portion.grams ?? 100;
   const [grams, setGrams] = useState(base);
   const [meal, setMeal] = useState<Meal>('Snack');
   const [logging, setLogging] = useState(false);
@@ -86,6 +86,8 @@ export function ProductSheet({ status, product, error, token, onDismiss }: Props
       </>
     );
   }
+
+  if (!product) return null; // 'done' always carries a product; this narrows the type
 
   const ratio = grams / base;
   const kcalMin = Math.round(product.nutrition.kcal.min * ratio);
