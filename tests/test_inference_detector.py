@@ -69,6 +69,13 @@ def test_decode_empty_when_nothing_confident() -> None:
     assert decode(output, scale=1.0, pad_x=0, pad_y=0, img_w=640, img_h=640) == []
 
 
+def test_decode_drops_boxes_off_the_image() -> None:
+    # A box centered far right of a narrow image collapses to zero width when
+    # clipped — it must be dropped, not returned as a zero-area region.
+    output = _raw_output([(900.0, 100.0, 40.0, 80.0, BOWL, 0.9)])
+    assert decode(output, scale=1.0, pad_x=0, pad_y=0, img_w=100, img_h=640) == []
+
+
 def test_region_is_plain_data() -> None:
     r = Region(box=(1, 2, 3, 4), score=0.5)
     assert r.box == (1, 2, 3, 4) and r.score == 0.5

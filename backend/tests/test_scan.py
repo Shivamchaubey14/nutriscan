@@ -107,6 +107,7 @@ def test_scan_multi_item_from_regions(
 
     regions = [
         region([0, 0, 100, 100], 0.9, "samosa", 0.88),
+        {"box": [50, 50, 60, 60], "score": 0.85, "predictions": []},  # malformed: no preds
         region([120, 0, 220, 100], 0.8, "idli", 0.7),
         region([0, 120, 100, 220], 0.7, "samosa", 0.6),  # duplicate label
         region([120, 120, 220, 220], 0.6, "unmapped", 0.5),  # not in nutrition DB

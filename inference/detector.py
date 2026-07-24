@@ -109,6 +109,13 @@ def decode(
     boxes[:, [0, 2]] = boxes[:, [0, 2]].clip(0, img_w)
     boxes[:, [1, 3]] = boxes[:, [1, 3]].clip(0, img_h)
 
+    # Drop degenerate boxes (a box fully off one axis collapses to zero width/
+    # height when clipped) — a zero-area crop would divide-by-zero downstream.
+    valid = (boxes[:, 2] > boxes[:, 0]) & (boxes[:, 3] > boxes[:, 1])
+    boxes, scores = boxes[valid], scores[valid]
+    if boxes.shape[0] == 0:
+        return []
+
     kept = nms(boxes, scores)[:MAX_ITEMS]
     return [
         Region(

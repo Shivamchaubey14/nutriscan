@@ -50,22 +50,26 @@ class ScanView(AsyncAPIView):  # type: ignore[misc]
         items = []
         seen_labels: set[str] = set()
         for region in result.get("regions", []):
-            region_top = region["predictions"][0]
-            label = region_top["label"]
-            if label in seen_labels:
+            # Defensive against a malformed region shape (inference/backend version
+            # skew): a bad region is skipped, not a 500 for the whole scan.
+            predictions = region.get("predictions") or []
+            if not predictions:
+                continue
+            label = predictions[0].get("label")
+            if not label or label in seen_labels:
                 continue
             nutrition = await sync_to_async(resolve_nutrition)(label)
             if nutrition is None:
                 continue
             seen_labels.add(label)
-            items.append(
-                {
-                    "label": label,
-                    "confidence": round(region_top["confidence"], 4),
-                    "box": region["box"],
-                    **nutrition,
-                }
-            )
+            item = {
+                "label": label,
+                "confidence": round(predictions[0].get("confidence", 0.0), 4),
+                **nutrition,
+            }
+            if region.get("box") is not None:
+                item["box"] = region["box"]
+            items.append(item)
         if not items and top_nutrition is not None:
             items.append(
                 {"label": top["label"], "confidence": round(top["confidence"], 4), **top_nutrition}
