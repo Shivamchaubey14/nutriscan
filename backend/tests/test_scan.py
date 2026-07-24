@@ -125,6 +125,28 @@ def test_scan_multi_item_from_regions(
     assert items[1]["nutrition"]["kcal"]["min"] > 0
 
 
+@pytest.mark.django_db
+def test_scan_portion_scales_with_box_area(
+    auth_client: APIClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Portion v1: the larger region gets more grams than the smaller one."""
+    _seed_idli()
+
+    def region(box: list[int], label: str) -> dict[str, Any]:
+        return {"box": box, "score": 0.9, "predictions": [{"label": label, "confidence": 0.9}]}
+
+    # big samosa region (200x200) vs small idli region (50x50)
+    regions = [region([0, 0, 200, 200], "samosa"), region([0, 0, 50, 50], "idli")]
+    monkeypatch.setattr(
+        "scans.views.classify",
+        _fake_classify([{"label": "samosa", "confidence": 0.9}], regions=regions),
+    )
+    resp = auth_client.post("/api/v1/scan/", {"image": _jpeg()}, format="multipart")
+    grams = {i["label"]: i["portion"]["grams"] for i in resp.json()["items"]}
+    assert grams["samosa"] > 100  # default samosa is 100 g -> scaled up (bigger box)
+    assert grams["idli"] < 75  # default idli is 75 g -> scaled down (smaller box)
+
+
 def _seed_idli() -> None:
     food = Food.objects.create(source="IFCT", source_id="idli1", name="Idli", food_group="cereal")
     amounts = {"energy_kcal": "128", "protein_g": "4", "carb_g": "26", "fat_g": "1"}

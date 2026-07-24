@@ -111,6 +111,12 @@ SIMPLE_JWT = {
 INFERENCE_URL = os.environ.get("INFERENCE_URL", "http://localhost:8001")
 INFERENCE_TIMEOUT = float(os.environ.get("INFERENCE_TIMEOUT", "10"))
 
+# Open Food Facts (packaged-product barcode lookup, FR-4). OFF asks every client
+# to send an identifying User-Agent.
+OFF_BASE_URL = os.environ.get("OFF_BASE_URL", "https://world.openfoodfacts.org")
+OFF_TIMEOUT = float(os.environ.get("OFF_TIMEOUT", "6"))
+OFF_USER_AGENT = os.environ.get("OFF_USER_AGENT", "NutriScan/1.0 (nutriscan app)")
+
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
