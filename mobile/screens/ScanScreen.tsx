@@ -1,19 +1,22 @@
 import { Ionicons } from '@expo/vector-icons';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { CameraView, useCameraPermissions, type BarcodeScanningResult } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ApiError } from '../api/client';
+import { lookupProduct, type Product } from '../api/product';
 import { scanImage, type ScanResponse } from '../api/scan';
 import { useAuth } from '../auth/AuthProvider';
 import { AppText } from '../components/AppText';
 import { Button } from '../components/Button';
+import { ProductSheet } from '../components/ProductSheet';
 import { ScanResultSheet } from '../components/ScanResultSheet';
 import { useTheme } from '../theme/ThemeProvider';
 
 type Status = 'camera' | 'processing' | 'done' | 'failed';
+type Mode = 'Food' | 'Barcode' | 'Label';
 
 const GROUND = '#2C3327';
 const OVERLAY = 'rgba(255,255,255,0.14)';
@@ -65,9 +68,20 @@ export function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView>(null);
   const [status, setStatus] = useState<Status>('camera');
+  const [mode, setMode] = useState<Mode>('Food');
   const [flash, setFlash] = useState(false);
   const [result, setResult] = useState<ScanResponse | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // A single frame fires onBarcodeScanned repeatedly — latch so we look up once.
+  const barcodeLatch = useRef(false);
+
+  const reset = () => {
+    setStatus('camera');
+    setResult(null);
+    setProduct(null);
+    barcodeLatch.current = false;
+  };
 
   const upload = async (uri: string) => {
     if (!accessToken) return;
@@ -80,6 +94,30 @@ export function ScanScreen() {
       setError(err instanceof ApiError ? err.message : 'Could not reach the scanner.');
       setStatus('failed');
     }
+  };
+
+  const onBarcode = async ({ data }: BarcodeScanningResult) => {
+    if (barcodeLatch.current || status !== 'camera' || !accessToken) return;
+    barcodeLatch.current = true;
+    setStatus('processing');
+    setError(null);
+    try {
+      setProduct(await lookupProduct(data, accessToken));
+      setStatus('done');
+    } catch (err) {
+      const msg = err instanceof ApiError && err.status === 404 ? "That product isn't in the database yet." : null;
+      setError(msg ?? (err instanceof ApiError ? err.message : 'Could not look up that barcode.'));
+      setStatus('failed');
+    }
+  };
+
+  const selectMode = (next: Mode) => {
+    if (next === 'Label') {
+      Alert.alert('Coming soon', 'Scanning nutrition labels (OCR) is on the way.');
+      return;
+    }
+    setMode(next);
+    reset();
   };
 
   const capture = async () => {
@@ -131,7 +169,14 @@ export function ScanScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: GROUND }}>
-      <CameraView ref={cameraRef} style={{ flex: 1 }} facing="back" flash={flash ? 'on' : 'off'}>
+      <CameraView
+        ref={cameraRef}
+        style={{ flex: 1 }}
+        facing="back"
+        flash={flash ? 'on' : 'off'}
+        barcodeScannerSettings={{ barcodeTypes: ['ean13', 'ean8', 'upc_a', 'upc_e', 'code128'] }}
+        onBarcodeScanned={mode === 'Barcode' && status === 'camera' ? (e) => void onBarcode(e) : undefined}
+      >
         <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
           {/* top controls */}
           <View
@@ -145,21 +190,25 @@ export function ScanScreen() {
           >
             <RoundBtn name="close" />
             <View style={{ flexDirection: 'row', backgroundColor: OVERLAY, borderRadius: 20, padding: 3 }}>
-              {['Food', 'Barcode', 'Label'].map((mode, i) => (
-                <View
-                  key={mode}
-                  style={{
-                    borderRadius: 17,
-                    paddingHorizontal: 14,
-                    paddingVertical: 6,
-                    backgroundColor: i === 0 ? '#FBF9F1' : 'transparent',
-                  }}
-                >
-                  <AppText variant="caption" style={{ color: i === 0 ? GROUND : '#FBF9F1' }}>
-                    {mode}
-                  </AppText>
-                </View>
-              ))}
+              {(['Food', 'Barcode', 'Label'] as Mode[]).map((m) => {
+                const active = m === mode;
+                return (
+                  <Pressable
+                    key={m}
+                    onPress={() => selectMode(m)}
+                    style={{
+                      borderRadius: 17,
+                      paddingHorizontal: 14,
+                      paddingVertical: 6,
+                      backgroundColor: active ? '#FBF9F1' : 'transparent',
+                    }}
+                  >
+                    <AppText variant="caption" style={{ color: active ? GROUND : '#FBF9F1' }}>
+                      {m}
+                    </AppText>
+                  </Pressable>
+                );
+              })}
             </View>
             <RoundBtn name={flash ? 'flash' : 'flash-off'} onPress={() => setFlash((f) => !f)} />
           </View>
@@ -179,7 +228,7 @@ export function ScanScreen() {
               >
                 <ActivityIndicator color="#FBF9F1" size="small" />
                 <AppText variant="secondary" style={{ color: '#FBF9F1' }}>
-                  Identifying your food…
+                  {mode === 'Barcode' ? 'Looking up product…' : 'Identifying your food…'}
                 </AppText>
               </View>
             </View>
@@ -199,36 +248,57 @@ export function ScanScreen() {
             }}
           >
             <RoundBtn name="images-outline" onPress={() => void pickFromGallery()} />
-            <Pressable
-              onPress={() => void capture()}
-              disabled={status === 'processing'}
-              style={{
-                width: 76,
-                height: 76,
-                borderRadius: 38,
-                backgroundColor: colors.sage,
-                borderWidth: 4,
-                borderColor: 'rgba(255,255,255,0.6)',
-                opacity: status === 'processing' ? 0.6 : 1,
-              }}
-            />
+            {mode === 'Barcode' ? (
+              <View
+                style={{
+                  backgroundColor: 'rgba(0,0,0,0.45)',
+                  borderRadius: 16,
+                  paddingHorizontal: spacing.l,
+                  paddingVertical: spacing.m,
+                }}
+              >
+                <AppText variant="secondary" style={{ color: '#FBF9F1' }}>
+                  Point at a barcode
+                </AppText>
+              </View>
+            ) : (
+              <Pressable
+                onPress={() => void capture()}
+                disabled={status === 'processing'}
+                style={{
+                  width: 76,
+                  height: 76,
+                  borderRadius: 38,
+                  backgroundColor: colors.sage,
+                  borderWidth: 4,
+                  borderColor: 'rgba(255,255,255,0.6)',
+                  opacity: status === 'processing' ? 0.6 : 1,
+                }}
+              />
+            )}
             <View style={{ width: 46 }} />
           </View>
         </SafeAreaView>
       </CameraView>
 
-      {(status === 'done' || status === 'failed') && (
-        <ScanResultSheet
-          status={status}
-          result={result}
-          error={error}
-          token={accessToken}
-          onDismiss={() => {
-            setStatus('camera');
-            setResult(null);
-          }}
-        />
-      )}
+      {(status === 'done' || status === 'failed') &&
+        (product ? (
+          <ProductSheet
+            status={status}
+            product={product}
+            error={error}
+            token={accessToken}
+            onDismiss={reset}
+          />
+        ) : (
+          <ScanResultSheet
+            status={status}
+            result={result}
+            error={error}
+            token={accessToken}
+            onDismiss={reset}
+          />
+        ))}
     </View>
   );
 }

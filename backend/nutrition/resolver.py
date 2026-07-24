@@ -20,6 +20,29 @@ def _grams(value: float) -> float | int:
     return int(value) if value.is_integer() else round(value, 1)
 
 
+def scale_portion(block: dict[str, Any], factor: float) -> dict[str, Any]:
+    """Rescale a portion + nutrition block by `factor` (calories scale with grams).
+
+    Portion-estimation v1: on a multi-item plate a bigger region gets more grams.
+    The starting portion is only a hint — it stays user-adjustable via the slider.
+    """
+    portion, nutrition = block["portion"], block["nutrition"]
+    return {
+        **block,
+        "portion": {**portion, "grams": _grams(float(portion["grams"]) * factor)},
+        "nutrition": {
+            **nutrition,
+            "kcal": {
+                "min": round(nutrition["kcal"]["min"] * factor),
+                "max": round(nutrition["kcal"]["max"] * factor),
+            },
+            "protein_g": round(nutrition["protein_g"] * factor, 1),
+            "carbs_g": round(nutrition["carbs_g"] * factor, 1),
+            "fat_g": round(nutrition["fat_g"] * factor, 1),
+        },
+    }
+
+
 def resolve_nutrition(label: str) -> dict[str, Any] | None:
     """Return the portion + nutrition block for a label, or None if unmapped."""
     cache_key = f"nutrition:{label}"

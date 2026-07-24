@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from django.urls import URLPattern, URLResolver, include, path
+from scans.views import ProductLookupView
 
 from config.views import HealthView
 
@@ -10,6 +11,7 @@ urlpatterns: list[URLPattern | URLResolver] = [
     path("health/", HealthView.as_view(), name="health"),
     path("api/v1/auth/", include("accounts.urls")),
     path("api/v1/scan/", include("scans.urls")),
+    path("api/v1/product/<str:barcode>/", ProductLookupView.as_view(), name="product-lookup"),
     path("api/v1/log/", include("logs.urls")),
     path("api/v1/foods/", include("nutrition.urls")),
 ]
